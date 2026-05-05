@@ -317,7 +317,7 @@
   .plane-row { display: flex; align-items: center; gap: 8px; }
   .plane-surface {
     position: relative;
-    width: 240px; height: 240px;
+    width: 340px; height: 340px;
     background: linear-gradient(180deg, oklch(100% 0 0 / 0.08), oklch(0% 0 0 / 0.08));
     border: 1px solid var(--plane-fg-faint);
     border-radius: 18px;
@@ -349,7 +349,7 @@
   }
   .knob-radial {
     position: absolute;
-    width: 200px; height: 200px;
+    width: 280px; height: 280px;
     transform: translate(-50%, -50%);
     border-radius: 50%;
     background: var(--plane-radial);
@@ -598,6 +598,123 @@
     color: var(--fg-faint);
     line-height: 1.5;
   }
+
+  /* ============ Hide button on plane panel ============ */
+  .plane-hide-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    color: var(--plane-fg-mute);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 180ms, background 180ms;
+  }
+  .plane-hide-btn:hover { color: var(--fg); background: var(--surface-2); }
+  .plane-hide-btn:focus-visible { outline: 2px solid var(--plane-dot-high); outline-offset: 2px; }
+
+  /* ============ Card detail view ============ */
+  body[data-view="plane"]    .view-card { display: none; }
+  body[data-view="settings"] .view-card { display: none; }
+  body[data-view="card"]     .view-plane    { display: none; }
+  body[data-view="card"]     .view-settings { display: none; }
+  .view-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+  }
+  .expanded-card {
+    background: linear-gradient(180deg, var(--card-grad-a) 0%, var(--card-grad-b) 100%);
+    border: 1px solid var(--surface-stroke);
+    border-radius: 16px;
+    padding: 18px 20px 22px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .expanded-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    margin: 0;
+  }
+  .expanded-by {
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 12.5px;
+    color: var(--fg-muted);
+  }
+  .expanded-summary {
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 13px;
+    color: var(--fg);
+    line-height: 1.55;
+    opacity: 0.88;
+  }
+  .expanded-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .tag-chip {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    color: var(--fg-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+  .expanded-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .open-link {
+    appearance: none;
+    background: var(--plane-dot-high);
+    border: 1px solid var(--plane-knob-border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--surface-1);
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .open-link:hover { filter: brightness(1.05); }
+  .distance-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
 </style>
 </head>
 <body data-view="plane">
@@ -613,7 +730,6 @@
       <div class="header-actions">
         <button class="icon-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme"></button>
         <button class="pill-btn" id="scatterBtn" aria-pressed="false">Scatter</button>
-        <button class="pill-btn" id="hidePlaneBtn">Hide</button>
         <button class="icon-btn" id="settingsBtn" aria-label="Open settings" title="Settings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/>
@@ -636,9 +752,16 @@
     <section class="plane-panel" id="planePanel">
       <div class="plane-label">Plane &middot; 2D</div>
       <div class="plane-corner-tick tl"></div>
-      <div class="plane-corner-tick tr"></div>
       <div class="plane-corner-tick bl"></div>
       <div class="plane-corner-tick br"></div>
+      <button class="plane-hide-btn" id="hidePlaneBtn" aria-label="Hide plane" title="Hide plane">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </button>
 
       <div class="plane-stage">
         <div class="axis-label" id="axisTop"></div>
@@ -655,6 +778,21 @@
         <div class="axis-label" id="axisBottom"></div>
       </div>
     </section>
+  </div>
+
+  <!-- ─────── Card detail view ─────── -->
+  <div class="view-card">
+    <header class="app-header">
+      <div style="min-width: 0; flex: 1;">
+        <div class="title"><span class="the">the</span> Card</div>
+        <div class="axes-label" id="cardMetaLine"></div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeBtn3" aria-label="Toggle theme" title="Toggle theme"></button>
+        <button class="pill-btn" id="cardBackBtn">Back</button>
+      </div>
+    </header>
+    <article class="expanded-card" id="expandedCard"></article>
   </div>
 
   <!-- ─────── Settings view ─────── -->
@@ -737,39 +875,38 @@
 <script>
 /* ============ Data ============ */
 const PLANE_ITEMS = [
-  // Meal + Purpose
-  { id: 'paper-fed', type: 'Paper', category: 'Markets & Research', title: 'National Affairs findings roundup on pricing power, passive ownership, fund concentration, and the presidential puzzle', by: 'by National Affairs editors', meta: '48 min read · Jan 2026', sm: 88, pp: 86 },
-  { id: 'paper-distill', type: 'Paper', category: 'Machine Learning', title: 'A primer on mixture-of-experts: scaling laws, routing collapse, and the compute-quality tradeoff', by: 'by Shan Wei, Rafael Lin', meta: '62 min read · arXiv', sm: 95, pp: 90 },
-  { id: 'tut-infra', type: 'Tutorial', category: 'Engineering', title: 'Building a production-grade queue on Postgres: locking, visibility timeouts, poison pills', by: 'by Hugo Vermeer', meta: '34 min read · ops.log', sm: 70, pp: 94 },
-  { id: 'newsletter-macro', type: 'Newsletter', category: 'Markets & Research', title: 'The dollar-yen basis is doing something weird again, and here is what to watch this week', by: 'by Marginal Curve', meta: '12 min read · weekly', sm: 55, pp: 78 },
-  { id: 'pod-deep-work', type: 'Podcast', category: 'Leadership', title: 'Deep work in the age of agents: interrupts, context, and the calendar as a moral document', by: 'with Sam Ober & Priya Naidu', meta: '1h 48m', sm: 80, pp: 68 },
-  // Snack + Purpose
-  { id: 'checklist-launch', type: 'Checklist', category: 'Engineering', title: 'The 9-item pre-launch checklist I run before every production deploy', by: 'by Dana Okafor', meta: '3 min read', sm: 12, pp: 88 },
-  { id: 'snippet-regex', type: 'Snippet', category: 'Engineering', title: 'Regex for semver with pre-release and build metadata, actually explained', by: 'saved from regex101', meta: '2 min read', sm: 8, pp: 82 },
-  { id: 'tip-negotiation', type: 'Clip', category: 'Leadership', title: 'The one question that resets a stalled negotiation in under thirty seconds', by: 'by Erin Meyer', meta: '1m 40s', sm: 18, pp: 74 },
-  { id: 'recipe-focaccia', type: 'Recipe', category: 'Lifestyle', title: 'No-knead overnight focaccia that works in a cold apartment kitchen', by: 'by Kitchen Ghost', meta: '4 min read', sm: 20, pp: 62 },
-  // Snack + Pleasure
-  { id: 'clip-dance', type: 'Clip', category: 'Culture', title: 'A street musician in Lisbon and a dog who absolutely commits to the bit', by: 'saved from @portastreet', meta: '0m 42s', sm: 5, pp: 8 },
-  { id: 'meme-founder', type: 'Meme', category: 'Culture', title: 'If founder posts were weather reports (chart)', by: 'via @weatherboyceo', meta: 'image', sm: 3, pp: 14 },
-  { id: 'tweet-physics', type: 'Thread', category: 'Curiosities', title: 'Why ice cubes crack when they hit warm water, in 5 posts and one GIF', by: 'by @phys_thread', meta: '3 min read', sm: 15, pp: 22 },
-  { id: 'short-cat', type: 'Clip', category: 'Culture', title: 'A cat discovers a mirror and has several opinions about it', by: 'saved from TikTok', meta: '0m 28s', sm: 2, pp: 5 },
-  { id: 'trivia-maps', type: 'Article', category: 'Curiosities', title: 'The strange geography of place names that end in "-ough" and nobody agrees how to pronounce', by: 'by Map Bureau', meta: '6 min read', sm: 25, pp: 28 },
-  // Meal + Pleasure
-  { id: 'doc-antarctic', type: 'Doc', category: 'Culture', title: 'The Radio Operators of Antarctica, a quiet film about six months of static', by: 'dir. Ines Holloway', meta: '1h 22m', sm: 85, pp: 25 },
-  { id: 'pod-history', type: 'Podcast', category: 'History', title: 'The fall of the Ming, told through the private ledgers of a tea merchant', by: 'with the Emperors & Margins crew', meta: '2h 10m', sm: 92, pp: 35 },
-  { id: 'essay-cities', type: 'Essay', category: 'Culture', title: 'On loving a city you cannot afford to live in anymore', by: 'by Moa Lindqvist', meta: '28 min read', sm: 68, pp: 20 },
-  { id: 'novel-excerpt', type: 'Excerpt', category: 'Fiction', title: 'First chapter of a forthcoming novel about a librarian and a lighthouse', by: 'by J. Arturo Cole', meta: '22 min read', sm: 72, pp: 12 },
-  // Center / mixed
-  { id: 'ai-workshop', type: 'Video', category: 'AI Tooling', title: "Avid on Anthropic's applied AI team prompting workshop", by: 'by Avid (@Av1dlive)', meta: '48m', sm: 58, pp: 72 },
-  { id: 'design-patterns', type: 'Talk', category: 'Design', title: 'Interaction patterns for spatial interfaces, nine case studies', by: 'by Priya Naidu', meta: '38m', sm: 62, pp: 60 },
-  { id: 'fin-primer', type: 'Article', category: 'Markets & Research', title: "A beginner's primer on duration and why bond math is actually okay", by: 'by Late Ledger', meta: '14 min read', sm: 45, pp: 70 },
-  { id: 'interview-writer', type: 'Interview', category: 'Culture', title: 'An afternoon with the translator of a novel nobody agrees how to translate', by: 'by Paris Review', meta: '38 min read', sm: 60, pp: 30 },
-  { id: 'snippet-css', type: 'Snippet', category: 'Design', title: 'One CSS trick: subgrid for editorial layouts without fighting your columns', by: 'saved from frontend.fyi', meta: '4 min read', sm: 22, pp: 68 },
+  { id: "art-01", type: "Post", category: "AI Tooling", sm: 11, pp: 67, title: "Min Choi on Claude Design generating UI, designs, and animations from text", by: "by Min Choi (@minchoi)", meta: "Apr 18, 2026", url: "https://x.com/minchoi/status/2045705871527653794?s=12", tags: ["Claude UI", "Claude Design", "Generative UI", "Prototyping", "Animation"], summary: "Min Choi's hype thread on Claude Design, which he pitches as generating insane UI, designs, and animations directly from text prompts. Frames it as an inflection point for design work and shares 10 wild examples in the attached thread. Post from April 18, 2026 landed roughly 918K views, 8.3K bookmarks, and 34.2K likes shortly after posting." },
+  { id: "art-02", type: "Post", category: "AI Commentary", sm: 11, pp: 78, title: "Evan Luthra on Perplexity's Personal Computer launch", by: "by Evan Luthra (@EvanLuthra)", meta: "Apr 16, 2026", url: "https://x.com/evanluthra/status/2044880920189272236", tags: ["Perplexity", "Agents", "AI Products"], summary: "Breaks down Perplexity's new Personal Computer product that runs on a Mac mini as a persistent AI worker. Routes tasks across 19 models simultaneously, runs multi-day workflows independently, and costs $200/month. Quotes Perplexity's official announcement about Mac App integration for local files and native apps." },
+  { id: "art-03", type: "Post", category: "Markets & Research", sm: 11, pp: 100, title: "Kieran Goodwin on CCLFX Liquidity and NAV Risk", by: "by Kieran Goodwin", meta: "Mar 27, 2026", url: "https://x.com/kieranwgoodwin/status/2037551988217426126", tags: ["Liquidity", "NAV Risk", "CCLFX"], summary: "Kieran Goodwin runs the numbers on CCLFX's liquidity situation, analyzing what 8 consecutive quarters of 5% NAV payouts would mean for the fund's $33.1B in assets relative to loan maturities and borrowings." },
+  { id: "art-04", type: "Post", category: "Current Events", sm: 22, pp: 44, title: "Aaron Rupar (@acyn) Political Clip", by: "by Aaron Rupar (@acyn)", meta: "Apr 9, 2026", url: "https://x.com/acyn/status/2041856898174218303?s=12", tags: ["Politics"], summary: "Aaron Rupar shares a political video clip on X." },
+  { id: "art-05", type: "Post", category: "Life & Leisure", sm: 0, pp: 22, title: "@rtwlz — Humor + AresMemo Worthy", by: "by @rtwlz", meta: "Apr 13, 2026", url: "https://x.com/rtwlz/status/2043661840832737396?s=12", tags: ["Humor", "AresMemo"], summary: "Humor post from @rtwlz on X, tagged AresMemo." },
+  { id: "art-06", type: "Post", category: "Creative & Media", sm: 0, pp: 56, title: "Renoise: Claude Code + Seedance 2.0 for Programmatic Video Ad Production", by: "by Renoise AI", meta: "Mar 23, 2026", url: "https://x.com/renoiseai/status/2036089896503529521", tags: ["Video"], summary: "Renoise introduces a tool combining Claude Code and Seedance 2.0 to scale video ad production 100x, turning one product photo into hundreds of finished video creatives." },
+  { id: "art-07", type: "Post", category: "Tax & Planning", sm: 33, pp: 100, title: "Michael Kitces on the Retirement Danger Zone", by: "by Michael Kitces", meta: "Mar 22, 2026", url: "https://x.com/michaelkitces/status/2035854079281217580", tags: ["Retirement", "Kitces", "AresMemo"], summary: "Kitces explains the retirement danger zone: the final decade before and first decade of retirement, where portfolio returns dwarf contributions and sequence-of-returns risk is at its peak." },
+  { id: "art-08", type: "Post", category: "AI Tooling", sm: 11, pp: 78, title: "Top 50 Claude Skills and GitHub Repos for AI", by: "by darkzodchi", meta: "Mar 20, 2026", url: "https://x.com/zodchiii/status/2034924354337714642", tags: ["Claude", "GitHub"], summary: "darkzodchi compiles a comprehensive list of the top 50 Claude skills and GitHub repositories for AI development, covering everything from coding assistants to knowledge management tools." },
+  { id: "art-09", type: "Post", category: "AI Tooling", sm: 0, pp: 67, title: "Stitch by Google open-sources the DESIGN.md specification", by: "by Stitch by Google (@stitchbygoogle)", meta: "Apr 21, 2026", url: "https://x.com/stitchbygoogle/status/2046624729403142320?s=12", tags: ["DESIGN.md", "Design Systems", "Open Source", "Agents", "WCAG"], summary: "Stitch by Google is open-sourcing the draft specification for DESIGN.md so it can be used across any tool or platform. The file lets teams export and import design rules from project to project, giving agents explicit intent (what a color is for, for example) and letting them validate their choices against WCAG accessibility rules. David East walks through the shared visual language in a companion video." },
+  { id: "art-10", type: "Post", category: "AI Tooling", sm: 0, pp: 56, title: "Kanika on Python Libraries and Data Sources", by: "by Kanika (@kanikabk)", meta: "Apr 10, 2026", url: "https://x.com/kanikabk/status/2042919910544986401?s=12", tags: ["Python", "Data Sources"], summary: "Kanika on X covering Python libraries and data sources for analysis workflows." },
+  { id: "art-11", type: "Article", category: "AI Tooling", sm: 44, pp: 78, title: "Ollama's Cloud Powers OpenClaw AI Assistant", by: "by Ollama", meta: "Mar 27, 2026", url: "https://ollama.com", tags: ["Local LLM", "Dev Tools"], summary: "Ollama adds native Visual Studio Code integration, letting developers use local LLMs for code completion, refactoring, and chat directly within their editor." },
+  { id: "art-12", type: "Article", category: "Science & World", sm: 11, pp: 0, title: "Ten Squats Every 45 Minutes Beats a 30-Minute Walk for Blood Sugar", by: "by Zib Atkins", meta: "Apr 06, 2026", url: "https://x.com/ayuswellness/status/2041079912438587749", tags: ["Wellness", "Exercise"], summary: "Zib Atkins cites a University of Texas study showing that doing just 10 squats every hour controls blood sugar better than a full 30-minute walk, with the added benefit of boosting circulation during sedentary workdays." },
+  { id: "art-13", type: "Article", category: "Markets & Research", sm: 56, pp: 100, title: "Inside the Private Equity-Insurance Nexus (FT)", by: "by MalcolmTucker", meta: "Jun 27, 2025", url: "https://x.com/bloodywanker913/status/1938461430702837960", tags: ["Private Equity", "Insurance", "Commentary"], summary: "MalcolmTucker flags a Financial Times investigation into the growing and controversial entanglement between private equity firms and insurance companies." },
+  { id: "art-14", type: "Article", category: "Tax & Planning", sm: 33, pp: 100, title: "The Discount Rate For Delaying Social Security Benefits", by: "by Michael Kitces", meta: "Apr 13, 2026", url: "https://www.kitces.com/blog/discount-rate-delaying-social-security-benefits-retirement-planning/", tags: ["Social Security", "Retirement Planning"], summary: "Kitces frames the decision to delay Social Security as a discount-rate problem, showing how the implied return on waiting stacks up against other fixed-income options in a client's retirement plan." },
+  { id: "art-15", type: "Video", category: "Creative & Media", sm: 78, pp: 0, title: "How to Make It in America", by: "by Ian Edelman (creator)", meta: "Apr 13, 2026", url: "https://en.wikipedia.org/wiki/How_to_Make_It_in_America", tags: ["To Watch", "TV Show"], summary: "Wikipedia entry for the HBO series following two young entrepreneurs hustling to build a fashion brand in New York City. Flagged as a watchlist item." },
+  { id: "art-16", type: "Video", category: "AI Tooling", sm: 78, pp: 78, title: "Allen Braden on Stanford's 2-hour LLM lecture", by: "by Allen Braden (@allen_explains)", meta: "Apr 16, 2026", url: "https://x.com/allen_explains/status/2044757995549319172", tags: ["Long form", "Educational", "LLMs", "Stanford"], summary: "Recommends a 2-hour Stanford lecture that breaks down how models like ChatGPT and Claude are actually built, described as clearer than what many people in top AI roles ever get exposed to." },
+  { id: "art-17", type: "Video", category: "AI Commentary", sm: 78, pp: 56, title: "YouTube video flagged Mythos under AI Commentary", by: "by YouTube", meta: "May 2, 2026", url: "https://youtube.com/watch?v=gKyV9gWZzRI", tags: ["Mythos", "AI Commentary"], summary: "YouTube clip tagged Mythos in the AI Commentary bucket, queued for the broader narrative-of-AI watch list." },
+  { id: "art-18", type: "Tool", category: "AI Tooling", sm: 22, pp: 56, title: "Tolaria, a free macOS markdown knowledge base for humans and AI", by: "by Luca Rossi (@lucaronin)", meta: "Apr 22, 2026", url: "https://tolaria.md", tags: ["Markdown", "Knowledge Base", "macOS", "Open Source", "AI Agents", "Tolaria"], summary: "Luca Rossi released Tolaria, a free and open-source macOS desktop app for managing markdown knowledge bases and letting AI agents and humans operate them together. He runs a 10,000-note personal workspace on it and frames Tolaria as his take on Karpathy's LLM wiki idea, a main collaboration surface where agents create new notes, link them to what exists, and edit existing ones because everything is just plain markdown files. Via @lucaronin on X." },
+  { id: "art-19", type: "Longform", category: "Markets & Research", sm: 78, pp: 100, title: "Min Jun Song on how passive ownership has eroded the value effect", by: "by Min Jun Song", meta: "Sep 25, 2025", url: "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5529782", tags: ["Passive Investing", "Value Effect", "Book-to-Price", "Target Date Funds", "Pension Protection Act"], summary: "Song documents a strong negative association between passive ownership and the value effect using 30 years of firm-level panel data. The identification leans on the 2006 Pension Protection Act, which pushed retirement money into Target Date Funds, and shows the decay in the book-to-price anomaly intensifies with TDF-driven flows that are not reacting to firm fundamentals. The attenuation starts with the PPA in 2006 (before the 2008 crisis), and is concentrated in names with weak information production and limited shareholder payouts." },
+  { id: "art-20", type: "Podcast", category: "Markets & Research", sm: 67, pp: 100, title: "Patrick OShaughnessy on Private Credit Investing", by: "by Patrick OShaughnessy", meta: "Apr 08, 2026", url: "https://x.com/patrick_oshag/status/2041848544017912132", tags: ["Private Credit", "Alternatives", "Invest Like The Best"], summary: "Patrick O'Shaughnessy interviews Alan Waxman of Sixth Street ($130B AUM) for a deep dive into the structural forces driving the private credit boom and what most market commentary is getting wrong." },
 ];
 
 const PLANE_CATEGORIES = {
   'AI Tooling':         { hue: 245, c: 0.09 },
+  'AI Commentary':      { hue: 215, c: 0.07 },
   'Markets & Research': { hue: 155, c: 0.08 },
+  'Tax & Planning':     { hue: 175, c: 0.06 },
+  'Current Events':     { hue: 10,  c: 0.08 },
+  'Creative & Media':   { hue: 30,  c: 0.08 },
+  'Life & Leisure':     { hue: 110, c: 0.07 },
+  'Science & World':    { hue: 195, c: 0.07 },
+  /* Original prototype categories kept as fallbacks */
   'Engineering':        { hue: 205, c: 0.07 },
   'Leadership':         { hue: 85,  c: 0.07 },
   'Culture':            { hue: 20,  c: 0.08 },
@@ -839,6 +976,12 @@ function typeGlyph(type) {
       return wrap('<circle cx="6" cy="6" r="4"/><circle cx="4.5" cy="5" r="0.5" fill="currentColor"/><circle cx="7.5" cy="5" r="0.5" fill="currentColor"/><path d="M4.5 7.5 Q6 8.5 7.5 7.5"/>');
     case 'Tutorial':
       return wrap('<path d="M2 3.5 H10 V8.5 H2 Z"/><path d="M4 6 H8 M4 7.5 H7"/>');
+    case 'Post':
+      return wrap('<path d="M1.8 2.5 H10.2 V8 H6.5 L4.5 10 V8 H1.8 Z"/>');
+    case 'Tool':
+      return wrap('<circle cx="6" cy="6" r="3"/><path d="M6 1.5 V3 M6 9 V10.5 M1.5 6 H3 M9 6 H10.5"/>');
+    case 'Longform':
+      return wrap('<path d="M3 2 H8 L9.5 3.5 V10 H3 Z"/><path d="M4.5 4.5 H8 M4.5 6 H8 M4.5 7.5 H6.5"/>');
     default:
       return wrap('<circle cx="6" cy="6" r="4"/>');
   }
@@ -886,7 +1029,10 @@ const state = {
     { id: null, timers: [] },
     { id: null, timers: [] },
     { id: null, timers: [] },
+    { id: null, timers: [] },
+    { id: null, timers: [] },
   ],
+  expandedId: readLS('plane-expanded-id', '') || null,
 };
 
 function persist() {
@@ -896,6 +1042,7 @@ function persist() {
     localStorage.setItem('plane-scatter',     state.scatter ? '1' : '0');
     localStorage.setItem('plane-hidden',      state.hidden  ? '1' : '0');
     localStorage.setItem('plane-view',        state.view);
+    localStorage.setItem('plane-expanded-id', state.expandedId || '');
     localStorage.setItem('plane-animation',   state.animation);
     localStorage.setItem('plane-speed',       String(state.speed));
     localStorage.setItem('plane-hover-delay', String(state.hoverDelay));
@@ -942,7 +1089,11 @@ function cardInnerHTML(item, dist) {
 }
 function attachCardHandlers(el, item) {
   el.addEventListener('click', () => {
-    console.log('[plane] open item:', item.id, item.title);
+    state.expandedId = item.id;
+    state.view = 'card';
+    renderExpandedCard();
+    applyView();
+    persist();
   });
   el.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
@@ -990,12 +1141,12 @@ function clearAllTimers() {
 const STRAT = {
   /* ---------- Sideswap: staggered horizontal exit/enter ---------- */
   sideswap: {
-    setup() {
+    setup(n) {
       clearAllTimers();
       const el = stack();
       el.className = 'result-stack mode-sideswap';
       el.innerHTML = '';
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < n; i++) {
         const slot = document.createElement('div');
         slot.className = 'slot';
         slot.dataset.slot = i;
@@ -1008,8 +1159,8 @@ const STRAT = {
       const ENTER_DUR = BASE.sideswapEnter / SPD;
       const GAP_DUR   = BASE.sideswapGap   / SPD;
       const STAGGER   = BASE.sideswapStagger / SPD;
-      const top = topN(3);
-      for (let i = 0; i < 3; i++) {
+      const top = topN(currentCount);
+      for (let i = 0; i < currentCount; i++) {
         const t = top[i];
         const slotEl = document.querySelector(`#resultStack .slot[data-slot="${i}"]`);
         if (!slotEl) continue;
@@ -1062,7 +1213,7 @@ const STRAT = {
 
   /* ---------- Slide: FLIP reorder + new-card fade-in ---------- */
   slide: {
-    setup() {
+    setup(n) {
       clearAllTimers();
       const el = stack();
       el.className = 'result-stack mode-slide';
@@ -1073,7 +1224,7 @@ const STRAT = {
       const MOVE_DUR = BASE.slideMove / SPD;
       const FADE_DUR = BASE.slideFade / SPD;
       const el = stack();
-      const top = topN(3);
+      const top = topN(currentCount);
 
       const oldRects = new Map();
       for (const child of el.children) {
@@ -1138,12 +1289,12 @@ const STRAT = {
 
   /* ---------- Flipboard: full-card single-axis rotateX flip ---------- */
   flipboard: {
-    setup() {
+    setup(n) {
       clearAllTimers();
       const el = stack();
       el.className = 'result-stack mode-flipboard';
       el.innerHTML = '';
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < n; i++) {
         const slot = document.createElement('div');
         slot.className = 'slot flip-slot';
         slot.dataset.slot = i;
@@ -1159,9 +1310,9 @@ const STRAT = {
     update(animate) {
       const SPD = state.speed;
       const DUR = BASE.flipDur / SPD;
-      const top = topN(3);
+      const top = topN(currentCount);
 
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < currentCount; i++) {
         const t = top[i];
         const slotEl = document.querySelector(`#resultStack .slot[data-slot="${i}"]`);
         if (!slotEl) continue;
@@ -1231,12 +1382,17 @@ const STRAT = {
   },
 };
 
+function getCount() { return state.hidden ? 5 : 3; }
+
 let currentMode = null;
+let currentCount = 0;
 function ensureStrategy() {
-  if (currentMode === state.animation) return;
+  const n = getCount();
+  if (currentMode === state.animation && currentCount === n) return;
   if (currentMode && STRAT[currentMode]) STRAT[currentMode].teardown();
   currentMode = state.animation;
-  STRAT[currentMode].setup();
+  currentCount = n;
+  STRAT[currentMode].setup(n);
 }
 
 function updateResults(animate) {
@@ -1331,7 +1487,7 @@ window.addEventListener('touchend',   onUp);
 function renderScatter() {
   surface.querySelectorAll('.scatter-dot').forEach(n => n.remove());
   if (!state.scatter) return;
-  const top = new Set(topN(3).map(t => t.item.id));
+  const top = new Set(topN(currentCount || 3).map(t => t.item.id));
   PLANE_ITEMS.forEach(it => {
     const dot = document.createElement('div');
     dot.className = 'scatter-dot' + (top.has(it.id) ? ' high' : '');
@@ -1370,18 +1526,19 @@ function sunIcon() {
 
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', state.theme);
-  for (const id of ['themeBtn', 'themeBtn2']) {
+  for (const id of ['themeBtn', 'themeBtn2', 'themeBtn3']) {
     const btn = document.getElementById(id);
     if (!btn) continue;
     btn.innerHTML = state.theme === 'dark' ? moonIcon() : sunIcon();
     btn.title = state.theme === 'dark' ? 'Switch to light' : 'Switch to dark';
   }
-  if (currentMode) STRAT[currentMode].setup();
+  if (currentMode) STRAT[currentMode].setup(currentCount || getCount());
   updateResults(false);
 }
 
 document.getElementById('themeBtn').addEventListener('click',  toggleTheme);
 document.getElementById('themeBtn2').addEventListener('click', toggleTheme);
+document.getElementById('themeBtn3').addEventListener('click', toggleTheme);
 function toggleTheme() {
   state.theme = state.theme === 'dark' ? 'light' : 'dark';
   applyTheme();
@@ -1409,16 +1566,30 @@ function applyHidden() {
 hideBtn.addEventListener('click', () => {
   state.hidden = !state.hidden;
   applyHidden();
+  ensureStrategy();
+  updateResults(false);
   persist();
 });
 document.getElementById('planeRestore').addEventListener('click', () => {
   state.hidden = false;
   applyHidden();
+  ensureStrategy();
+  updateResults(false);
   persist();
 });
 
 /* ============ View switching ============ */
 function applyView() {
+  // Defensive: don't restore card view if no expanded item, fall back to plane
+  if (state.view === 'card') {
+    const item = PLANE_ITEMS.find(p => p.id === state.expandedId);
+    if (!item) {
+      state.view = 'plane';
+      state.expandedId = null;
+    } else {
+      renderExpandedCard();
+    }
+  }
   document.body.dataset.view = state.view;
 }
 document.getElementById('settingsBtn').addEventListener('click', () => {
@@ -1428,6 +1599,49 @@ document.getElementById('settingsBtn').addEventListener('click', () => {
 });
 document.getElementById('backBtn').addEventListener('click', () => {
   state.view = 'plane';
+  applyView();
+  persist();
+});
+
+/* ============ Card detail view ============ */
+function renderExpandedCard() {
+  const item = PLANE_ITEMS.find(p => p.id === state.expandedId);
+  const el = document.getElementById('expandedCard');
+  const meta = document.getElementById('cardMetaLine');
+  if (!item) {
+    if (el) el.innerHTML = '';
+    if (meta) meta.textContent = '';
+    return;
+  }
+  const cat = categoryColors(item.category, state.theme);
+  const dist = distance(item);
+  if (meta) meta.textContent = `${item.type} · ${item.category}`;
+  const tags = (item.tags || []).map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join('');
+  const url = item.url
+    ? `<a class="open-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">Open</a>`
+    : '<span></span>';
+  el.innerHTML = `
+    <div class="card-meta">
+      <span class="cat-pill" style="background: ${cat.bg}; color: ${cat.fg}">
+        ${typeGlyph(item.type)}
+        <span>${escapeHtml(item.category)}</span>
+      </span>
+      <span class="card-meta-text">${escapeHtml(item.type)} · ${escapeHtml(item.meta || '')}</span>
+    </div>
+    <h2 class="expanded-title">${escapeHtml(item.title)}</h2>
+    <div class="expanded-by">${escapeHtml(item.by || '')}</div>
+    ${item.summary ? `<div class="expanded-summary">${escapeHtml(item.summary)}</div>` : ''}
+    ${tags ? `<div class="expanded-tags">${tags}</div>` : ''}
+    <div class="expanded-actions">
+      ${url}
+      <span class="distance-badge">Distance · ${Math.round(dist)}</span>
+    </div>
+  `;
+}
+
+document.getElementById('cardBackBtn').addEventListener('click', () => {
+  state.view = 'plane';
+  state.expandedId = null;
   applyView();
   persist();
 });
