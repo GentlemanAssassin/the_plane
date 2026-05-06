@@ -96,8 +96,8 @@
   /* ============ Responsive size variables ============ */
   :root {
     --card-height:  96px;
-    --plane-size:  290px;
-    --radial-size: 240px;
+    --plane-size:  200px;
+    --radial-size: 165px;
     --app-pad-top: 28px;
     --app-pad-bot: 36px;
     --stack-gap:    16px;
@@ -106,8 +106,8 @@
   @media (max-height: 820px) {
     :root {
       --card-height:  86px;
-      --plane-size:  255px;
-      --radial-size: 210px;
+      --plane-size:  175px;
+      --radial-size: 144px;
       --app-pad-top: 22px;
       --app-pad-bot: 28px;
       --stack-gap:    12px;
@@ -116,8 +116,8 @@
   @media (max-height: 720px) {
     :root {
       --card-height:  74px;
-      --plane-size:  215px;
-      --radial-size: 178px;
+      --plane-size:  148px;
+      --radial-size: 122px;
       --app-pad-top: 16px;
       --app-pad-bot: 20px;
       --stack-gap:     8px;
@@ -126,8 +126,8 @@
   @media (max-height: 640px) {
     :root {
       --card-height:  62px;
-      --plane-size:  170px;
-      --radial-size: 140px;
+      --plane-size:  118px;
+      --radial-size:  97px;
       --app-pad-top: 12px;
       --app-pad-bot: 14px;
       --stack-gap:     6px;
@@ -143,6 +143,56 @@
   @media (max-width: 430px) and (max-height: 750px) {
     .plane-panel { padding: 8px; }
   }
+
+
+  /* ============ Category Jump Shelf ============ */
+  .category-shelf {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 0 4px;
+  }
+  .cat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px 4px 6px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background: var(--chip-bg);
+    color: var(--chip-fg);
+    font-size: 9.5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 120ms ease;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  .cat-chip:active { transform: scale(0.93); }
+  .cat-chip .chip-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--chip-fg);
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+  .cat-chip .chip-count {
+    opacity: 0.55;
+    font-size: 8.5px;
+    margin-left: 1px;
+  }
+  /* Active category (in current top-N) glows */
+  .cat-chip.hot {
+    border-color: var(--chip-fg);
+    box-shadow: 0 0 0 1px var(--chip-fg), 0 0 10px color-mix(in oklch, var(--chip-fg) 35%, transparent);
+  }
+  .cat-chip.hot .chip-dot { opacity: 1; }
+  /* Hide shelf when plane is hidden (full card list mode) */
+  body[data-plane-hidden="1"] .category-shelf { display: none; }
 
   *, *::before, *::after { box-sizing: border-box; }
   * { -webkit-tap-highlight-color: transparent; }
@@ -800,6 +850,8 @@
     </header>
 
     <main class="result-stack" id="resultStack"></main>
+
+    <div class="category-shelf" id="categoryShelf"></div>
 
     <button class="plane-restore" id="planeRestore" type="button">
       <span class="restore-text">
@@ -1459,6 +1511,7 @@ function updateResults(animate) {
   ensureStrategy();
   STRAT[currentMode].update(animate);
   renderScatter();
+  renderCategoryShelf();
 }
 
 /* ============ Hover-delay scheduler ============ */
@@ -1542,6 +1595,52 @@ window.addEventListener('mousemove',  onMove);
 window.addEventListener('touchmove',  onMove, { passive: false });
 window.addEventListener('mouseup',    onUp);
 window.addEventListener('touchend',   onUp);
+
+/* ============ Category Jump Shelf ============ */
+function renderCategoryShelf() {
+  const shelf = document.getElementById('categoryShelf');
+  if (!shelf) return;
+
+  // Count articles per category
+  const cats = {};
+  PLANE_ITEMS.forEach(it => {
+    cats[it.category] = (cats[it.category] || 0) + 1;
+  });
+
+  // Determine which categories are "hot" (in current top-N)
+  const topIds = new Set(topN(currentCount || 3).map(t => t.item.id));
+  const hotCats = new Set(PLANE_ITEMS.filter(it => topIds.has(it.id)).map(it => it.category));
+
+  // Sort by count descending
+  const sorted = Object.entries(cats).sort((a, b) => b[1] - a[1]);
+
+  shelf.innerHTML = sorted.map(([name, count]) => {
+    const colors = categoryColors(name, state.theme);
+    const isHot  = hotCats.has(name);
+    // Shorten label: first meaningful word, max 8 chars
+    const words   = name.split(/[\s&]+/);
+    const abbrev  = words[0].length <= 8 ? words[0] : words[0].slice(0, 7) + '…';
+    return `<button class="cat-chip${isHot ? ' hot' : ''}"
+      style="--chip-fg:${colors.fg};--chip-bg:${colors.bg}"
+      onclick="moveToCategoryCenter(${JSON.stringify(name)})"
+      title="${escapeHtml(name)} · ${count} item${count !== 1 ? 's' : ''} · tap to jump">
+      <span class="chip-dot"></span>
+      <span class="chip-name">${escapeHtml(abbrev)}</span>
+      <span class="chip-count">${count}</span>
+    </button>`;
+  }).join('');
+}
+
+function moveToCategoryCenter(name) {
+  const items = PLANE_ITEMS.filter(it => it.category === name);
+  if (!items.length) return;
+  const cx = items.reduce((s, it) => s + (it[DIM.xKey] || 0), 0) / items.length / 100;
+  const cy = items.reduce((s, it) => s + (it[DIM.yKey] || 0), 0) / items.length / 100;
+  state.value = { x: clamp01(cx), y: clamp01(cy) };
+  setKnob();
+  persist();
+  updateResults(true);
+}
 
 /* ============ Scatter dots ============ */
 function renderScatter() {
