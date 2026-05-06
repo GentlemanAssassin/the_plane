@@ -1618,8 +1618,13 @@ function renderCategoryShelf() {
     const colors = categoryColors(name, state.theme);
     const isHot  = hotCats.has(name);
     // Shorten label: first meaningful word, max 8 chars
-    const words   = name.split(/[\s&]+/);
-    const abbrev  = words[0].length <= 8 ? words[0] : words[0].slice(0, 7) + '…';
+    const words   = name.split(/[\s&]+/).filter(w => w.length > 0);
+    let abbrev;
+    if (words[0].length <= 3 && words[1]) {
+      abbrev = words[0] + '\u00a0' + words[1].slice(0, 4);
+    } else {
+      abbrev = words[0].length <= 8 ? words[0] : words[0].slice(0, 7) + '…';
+    }
     return `<button class="cat-chip${isHot ? ' hot' : ''}"
       style="--chip-fg:${colors.fg};--chip-bg:${colors.bg}"
       onclick="moveToCategoryCenter(${JSON.stringify(name)})"
