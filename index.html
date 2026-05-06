@@ -94,105 +94,56 @@
   }
 
   /* ============ Responsive size variables ============ */
+  /* Card-title font scales with the card height so titles never get clipped
+     on iOS Safari or narrow MacOS Chrome (per ThePlane Dev notes 2026-05-06). */
   :root {
-    --card-height:  96px;
-    --plane-size:  200px;
-    --radial-size: 165px;
-    --app-pad-top: 28px;
-    --app-pad-bot: 36px;
-    --stack-gap:    16px;
+    --card-height:    96px;
+    --card-title-fs:  14.5px;
+    --card-meta-fs:   10px;
+    --card-by-fs:     11px;
+    --plane-size:    290px;
+    --radial-size:   240px;
+    --app-pad-top:   28px;
+    --app-pad-bot:   36px;
+    --stack-gap:      16px;
   }
-  /* Shrink for shorter viewports (iOS Safari with URL bar visible, etc.) */
   @media (max-height: 820px) {
     :root {
-      --card-height:  86px;
-      --plane-size:  175px;
-      --radial-size: 144px;
-      --app-pad-top: 22px;
-      --app-pad-bot: 28px;
-      --stack-gap:    12px;
+      --card-height:    86px;
+      --card-title-fs:  13.5px;
+      --plane-size:    255px;
+      --radial-size:   210px;
+      --app-pad-top:   22px;
+      --app-pad-bot:   28px;
+      --stack-gap:      12px;
     }
   }
   @media (max-height: 720px) {
     :root {
-      --card-height:  74px;
-      --plane-size:  148px;
-      --radial-size: 122px;
-      --app-pad-top: 16px;
-      --app-pad-bot: 20px;
-      --stack-gap:     8px;
+      --card-height:    74px;
+      --card-title-fs:  12.5px;
+      --card-meta-fs:    9.5px;
+      --card-by-fs:     10.5px;
+      --plane-size:    215px;
+      --radial-size:   178px;
+      --app-pad-top:   16px;
+      --app-pad-bot:   20px;
+      --stack-gap:       8px;
     }
   }
   @media (max-height: 640px) {
     :root {
-      --card-height:  62px;
-      --plane-size:  118px;
-      --radial-size:  97px;
-      --app-pad-top: 12px;
-      --app-pad-bot: 14px;
-      --stack-gap:     6px;
+      --card-height:    62px;
+      --card-title-fs:  11.5px;
+      --card-meta-fs:    9px;
+      --card-by-fs:     10px;
+      --plane-size:    170px;
+      --radial-size:   140px;
+      --app-pad-top:   12px;
+      --app-pad-bot:   14px;
+      --stack-gap:       6px;
     }
   }
-
-
-  /* ============ Mobile scatter fix: more room for post list ============ */
-  @media (max-width: 430px) {
-    .plane-panel { padding: 10px; }
-    .plane-stage { gap: 5px; }
-  }
-  @media (max-width: 430px) and (max-height: 750px) {
-    .plane-panel { padding: 8px; }
-  }
-
-
-  /* ============ Category Jump Shelf ============ */
-  .category-shelf {
-    flex-shrink: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 0 4px;
-  }
-  .cat-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px 4px 6px;
-    border-radius: 20px;
-    border: 1px solid transparent;
-    background: var(--chip-bg);
-    color: var(--chip-fg);
-    font-size: 9.5px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: border-color 200ms ease, box-shadow 200ms ease, transform 120ms ease;
-    -webkit-tap-highlight-color: transparent;
-    white-space: nowrap;
-  }
-  .cat-chip:active { transform: scale(0.93); }
-  .cat-chip .chip-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--chip-fg);
-    flex-shrink: 0;
-    opacity: 0.8;
-  }
-  .cat-chip .chip-count {
-    opacity: 0.55;
-    font-size: 8.5px;
-    margin-left: 1px;
-  }
-  /* Active category (in current top-N) glows */
-  .cat-chip.hot {
-    border-color: var(--chip-fg);
-    box-shadow: 0 0 0 1px var(--chip-fg), 0 0 10px color-mix(in oklch, var(--chip-fg) 35%, transparent);
-  }
-  .cat-chip.hot .chip-dot { opacity: 1; }
-  /* Hide shelf when plane is hidden (full card list mode) */
-  body[data-plane-hidden="1"] .category-shelf { display: none; }
 
   *, *::before, *::after { box-sizing: border-box; }
   * { -webkit-tap-highlight-color: transparent; }
@@ -296,10 +247,6 @@
     flex-direction: column;
     gap: 8px;
     position: relative;
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
   }
   @media (max-height: 720px) { .result-stack { gap: 6px; } }
   @media (max-height: 640px) { .result-stack { gap: 5px; } }
@@ -350,14 +297,14 @@
   .card-meta-text {
     color: var(--fg-faint);
     font-family: 'IBM Plex Sans', system-ui;
-    font-size: 10px;
+    font-size: var(--card-meta-fs);
     font-weight: 500;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     min-width: 0; flex: 1 1 auto;
   }
   .card-title {
     font-family: 'IBM Plex Sans', system-ui;
-    font-size: 14.5px; line-height: 1.22;
+    font-size: var(--card-title-fs); line-height: 1.22;
     color: var(--fg);
     font-weight: 600;
     letter-spacing: -0.005em;
@@ -365,13 +312,16 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
   }
   .card-byline {
     margin-top: 4px;
     color: var(--fg-muted);
     font-family: 'IBM Plex Sans', system-ui;
-    font-size: 11px;
+    font-size: var(--card-by-fs);
     display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    flex-shrink: 0;
   }
   .card-by { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .card-dist { font-variant-numeric: tabular-nums; opacity: 0.5; flex-shrink: 0; }
@@ -384,8 +334,7 @@
     background: linear-gradient(145deg, var(--plane-panel-a), var(--plane-panel-b));
     box-shadow: var(--plane-panel-shadow);
     align-self: center;
-    margin-top: auto;
-    flex-shrink: 0;
+    margin-top: 4px;
   }
   .plane-corner-tick { position: absolute; width: 8px; height: 8px; }
   .plane-corner-tick.tl { top: 4px; left: 4px;
@@ -410,21 +359,22 @@
     border: 1px solid var(--surface-stroke);
   }
   .plane-stage {
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
     user-select: none;
   }
+  /* Axis labels: bumped per ThePlane Dev notes 2026-05-06 to read clearly. */
   .axis-label {
     color: var(--plane-fg-mute);
-    font-size: 9.5px;
+    font-size: 12px;
     font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    display: flex; align-items: center; gap: 5px;
-    font-weight: 500;
+    display: flex; align-items: center; gap: 7px;
+    font-weight: 600;
   }
   .axis-label.vert { writing-mode: vertical-rl; }
   .axis-label.vert.left { transform: rotate(180deg); }
-  .plane-row { display: flex; align-items: center; gap: 8px; }
+  .plane-row { display: flex; align-items: center; gap: 14px; }
   .plane-surface {
     position: relative;
     width: var(--plane-size); height: var(--plane-size);
@@ -661,32 +611,71 @@
     border: 1px solid var(--plane-knob-border);
     cursor: pointer;
   }
-  .swatch-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .swatch {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 56px;
-    height: 28px;
-    border-radius: 7px;
-    border: 1px solid var(--surface-stroke);
-    padding: 0;
-    cursor: pointer;
-    background: transparent;
-    flex-shrink: 0;
-  }
-  .swatch::-webkit-color-swatch-wrapper { padding: 0; }
-  .swatch::-webkit-color-swatch { border: 0; border-radius: 6px; }
-  .swatch::-moz-color-swatch { border: 0; border-radius: 6px; }
   .hex-display {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 10.5px;
     color: var(--fg-muted);
     text-transform: uppercase;
     font-variant-numeric: tabular-nums;
+    margin-left: 4px;
+  }
+  /* ============ Palette grid (curated 10 presets) ============ */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .palette-tile {
+    appearance: none;
+    border: 1px solid var(--surface-stroke);
+    border-radius: 10px;
+    padding: 0;
+    cursor: pointer;
+    background: var(--tile-primary, var(--surface-1));
+    height: 44px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 180ms, transform 120ms ease, box-shadow 180ms;
+  }
+  .palette-tile:active { transform: scale(0.96); }
+  .palette-tile .tile-secondary {
+    position: absolute;
+    right: 6px; top: 6px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--tile-secondary, transparent);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.18);
+  }
+  .palette-tile .tile-name {
+    position: absolute;
+    left: 6px; bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tile-secondary, var(--fg));
+    opacity: 0.92;
+  }
+  .palette-tile[aria-pressed="true"] {
+    border-color: var(--tile-secondary, var(--fg));
+    box-shadow: 0 0 0 2px var(--tile-secondary, var(--fg));
+  }
+  .palette-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 11.5px;
+    color: var(--fg-muted);
+    align-items: center;
+  }
+  .palette-legend .legend-swatch {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: -1px;
+    border: 1px solid var(--surface-stroke);
   }
   .reset-btn {
     align-self: flex-start;
@@ -851,8 +840,6 @@
 
     <main class="result-stack" id="resultStack"></main>
 
-    <div class="category-shelf" id="categoryShelf"></div>
-
     <button class="plane-restore" id="planeRestore" type="button">
       <span class="restore-text">
         <span class="restore-title">Plane is hidden</span>
@@ -945,9 +932,9 @@
         <div class="field">
           <div class="field-row">
             <span class="field-label">Hover delay</span>
-            <span class="field-value" id="hoverValue">0 ms</span>
+            <span class="field-value" id="hoverValue">50 ms</span>
           </div>
-          <input type="range" class="slider" id="hoverSlider" min="0" max="800" step="25" value="0">
+          <input type="range" class="slider" id="hoverSlider" min="0" max="800" step="25" value="50">
           <div class="preview-line">How long the knob has to hold near a point before the cards reorder. The knob still follows your cursor instantly.</div>
         </div>
       </section>
@@ -956,23 +943,16 @@
         <div class="section-label">Color</div>
         <div class="field">
           <div class="field-row">
-            <span class="field-label">Main</span>
-            <span class="swatch-row">
-              <span class="hex-display" id="mainHex"></span>
-              <input type="color" class="swatch" id="mainSwatch" value="#0e1a2e">
-            </span>
+            <span class="field-label">Palette</span>
+            <span class="field-value" id="paletteName">Midnight</span>
           </div>
+          <div class="palette-grid" id="paletteGrid"></div>
         </div>
-        <div class="field">
-          <div class="field-row">
-            <span class="field-label">Primary</span>
-            <span class="swatch-row">
-              <span class="hex-display" id="primaryHex"></span>
-              <input type="color" class="swatch" id="primarySwatch" value="#7be0ff">
-            </span>
-          </div>
+        <div class="palette-legend">
+          <span><span class="legend-swatch" id="legendPrimary"></span>Primary <span class="hex-display" id="primaryHex"></span></span>
+          <span><span class="legend-swatch" id="legendSecondary"></span>Secondary <span class="hex-display" id="secondaryHex"></span></span>
         </div>
-        <div class="preview-line">Main drives the page background and plane panel. Primary drives the knob, dot highlights, and accents. Both retune for dark and light themes.</div>
+        <div class="preview-line">Primary drives the page background and plane panel. Secondary drives the knob, dot highlights, and accents. Both retune for dark and light themes.</div>
       </section>
 
       <section class="section">
@@ -1052,10 +1032,30 @@ const DIM = {
 const DEFAULTS = {
   animation: 'sideswap',
   speed: 1.2,
-  hoverDelay: 0,
-  mainColor: '#0e1a2e',
-  primaryColor: '#7be0ff',
+  hoverDelay: 50,
+  mainColor: '#0E1A2E',   // Primary (Midnight)
+  primaryColor: '#7BE0FF', // Secondary (Midnight)
 };
+
+/* ============ Curated palette presets ============ */
+/* Per ThePlane Dev notes 2026-05-06: limit color options to 10 named pairs. */
+const PALETTES = [
+  { name: 'Midnight', primary: '#0E1A2E', secondary: '#7BE0FF' },
+  { name: 'Mint',     primary: '#111827', secondary: '#6EE7B7' },
+  { name: 'Lime',     primary: '#18181B', secondary: '#A3E635' },
+  { name: 'Fern',     primary: '#2E332B', secondary: '#8BCF6A' },
+  { name: 'Orchid',   primary: '#111B33', secondary: '#C084FC' },
+  { name: 'Coral',    primary: '#262626', secondary: '#FB7185' },
+  { name: 'Teal',     primary: '#102A2C', secondary: '#67E8F9' },
+  { name: 'Rose',     primary: '#24162E', secondary: '#F0ABFC' },
+  { name: 'Amber',    primary: '#1F2937', secondary: '#FBBF24' },
+  { name: 'Sky',      primary: '#151A24', secondary: '#60A5FA' },
+];
+function findPaletteIndex(primaryHex, secondaryHex) {
+  const p = (primaryHex || '').toUpperCase();
+  const s = (secondaryHex || '').toUpperCase();
+  return PALETTES.findIndex(pal => pal.primary.toUpperCase() === p && pal.secondary.toUpperCase() === s);
+}
 
 // Base durations (ms). Divided by state.speed at animation time.
 const BASE = {
@@ -1511,7 +1511,6 @@ function updateResults(animate) {
   ensureStrategy();
   STRAT[currentMode].update(animate);
   renderScatter();
-  renderCategoryShelf();
 }
 
 /* ============ Hover-delay scheduler ============ */
@@ -1595,57 +1594,6 @@ window.addEventListener('mousemove',  onMove);
 window.addEventListener('touchmove',  onMove, { passive: false });
 window.addEventListener('mouseup',    onUp);
 window.addEventListener('touchend',   onUp);
-
-/* ============ Category Jump Shelf ============ */
-function renderCategoryShelf() {
-  const shelf = document.getElementById('categoryShelf');
-  if (!shelf) return;
-
-  // Count articles per category
-  const cats = {};
-  PLANE_ITEMS.forEach(it => {
-    cats[it.category] = (cats[it.category] || 0) + 1;
-  });
-
-  // Determine which categories are "hot" (in current top-N)
-  const topIds = new Set(topN(currentCount || 3).map(t => t.item.id));
-  const hotCats = new Set(PLANE_ITEMS.filter(it => topIds.has(it.id)).map(it => it.category));
-
-  // Sort by count descending
-  const sorted = Object.entries(cats).sort((a, b) => b[1] - a[1]);
-
-  shelf.innerHTML = sorted.map(([name, count]) => {
-    const colors = categoryColors(name, state.theme);
-    const isHot  = hotCats.has(name);
-    // Shorten label: first meaningful word, max 8 chars
-    const words   = name.split(/[\s&]+/).filter(w => w.length > 0);
-    let abbrev;
-    if (words[0].length <= 3 && words[1]) {
-      abbrev = words[0] + '\u00a0' + words[1].slice(0, 4);
-    } else {
-      abbrev = words[0].length <= 8 ? words[0] : words[0].slice(0, 7) + '…';
-    }
-    return `<button class="cat-chip${isHot ? ' hot' : ''}"
-      style="--chip-fg:${colors.fg};--chip-bg:${colors.bg}"
-      onclick="moveToCategoryCenter(${JSON.stringify(name)})"
-      title="${escapeHtml(name)} · ${count} item${count !== 1 ? 's' : ''} · tap to jump">
-      <span class="chip-dot"></span>
-      <span class="chip-name">${escapeHtml(abbrev)}</span>
-      <span class="chip-count">${count}</span>
-    </button>`;
-  }).join('');
-}
-
-function moveToCategoryCenter(name) {
-  const items = PLANE_ITEMS.filter(it => it.category === name);
-  if (!items.length) return;
-  const cx = items.reduce((s, it) => s + (it[DIM.xKey] || 0), 0) / items.length / 100;
-  const cy = items.reduce((s, it) => s + (it[DIM.yKey] || 0), 0) / items.length / 100;
-  state.value = { x: clamp01(cx), y: clamp01(cy) };
-  setKnob();
-  persist();
-  updateResults(true);
-}
 
 /* ============ Scatter dots ============ */
 function renderScatter() {
@@ -1887,17 +1835,59 @@ function applyColorOverrides() {
 }
 
 /* ============ Settings controls ============ */
-const speedSlider  = document.getElementById('speedSlider');
-const speedValue   = document.getElementById('speedValue');
-const hoverSlider  = document.getElementById('hoverSlider');
-const hoverValue   = document.getElementById('hoverValue');
-const animationSeg = document.getElementById('animationSeg');
-const segThumb     = animationSeg.querySelector('.seg-thumb');
-const mainSwatch   = document.getElementById('mainSwatch');
-const mainHex      = document.getElementById('mainHex');
-const primarySwatch= document.getElementById('primarySwatch');
-const primaryHex   = document.getElementById('primaryHex');
-const resetBtn     = document.getElementById('resetBtn');
+const speedSlider    = document.getElementById('speedSlider');
+const speedValue     = document.getElementById('speedValue');
+const hoverSlider    = document.getElementById('hoverSlider');
+const hoverValue     = document.getElementById('hoverValue');
+const animationSeg   = document.getElementById('animationSeg');
+const segThumb       = animationSeg.querySelector('.seg-thumb');
+const paletteGrid    = document.getElementById('paletteGrid');
+const paletteName    = document.getElementById('paletteName');
+const legendPrimary  = document.getElementById('legendPrimary');
+const legendSecondary= document.getElementById('legendSecondary');
+const primaryHex     = document.getElementById('primaryHex');
+const secondaryHex   = document.getElementById('secondaryHex');
+const resetBtn       = document.getElementById('resetBtn');
+
+/* Render the 10 curated palette tiles */
+function renderPaletteGrid() {
+  paletteGrid.innerHTML = PALETTES.map((p, i) => {
+    return `<button type="button"
+        class="palette-tile"
+        data-index="${i}"
+        aria-pressed="false"
+        title="${p.name} — Primary ${p.primary} · Secondary ${p.secondary}"
+        style="--tile-primary:${p.primary};--tile-secondary:${p.secondary}">
+      <span class="tile-secondary"></span>
+      <span class="tile-name">${p.name}</span>
+    </button>`;
+  }).join('');
+}
+function applyPaletteSelection() {
+  let idx = findPaletteIndex(state.mainColor, state.primaryColor);
+  if (idx < 0) idx = 0;
+  paletteGrid.querySelectorAll('.palette-tile').forEach((t, i) => {
+    t.setAttribute('aria-pressed', i === idx ? 'true' : 'false');
+  });
+  const p = PALETTES[idx];
+  paletteName.textContent = p.name;
+  primaryHex.textContent   = p.primary.toUpperCase();
+  secondaryHex.textContent = p.secondary.toUpperCase();
+  legendPrimary.style.background   = p.primary;
+  legendSecondary.style.background = p.secondary;
+}
+paletteGrid.addEventListener('click', (e) => {
+  const btn = e.target.closest('.palette-tile');
+  if (!btn) return;
+  const idx = parseInt(btn.dataset.index, 10);
+  if (isNaN(idx) || !PALETTES[idx]) return;
+  const p = PALETTES[idx];
+  state.mainColor    = p.primary;
+  state.primaryColor = p.secondary;
+  applyPaletteSelection();
+  applyColorOverrides();
+  persist();
+});
 
 function applyAnimationSeg() {
   const buttons = animationSeg.querySelectorAll('button[data-value]');
@@ -1943,24 +1933,7 @@ hoverSlider.addEventListener('input', () => {
 });
 hoverSlider.addEventListener('change', () => persist());
 
-function applyColorInputs() {
-  mainSwatch.value    = state.mainColor;
-  primarySwatch.value = state.primaryColor;
-  mainHex.textContent    = state.mainColor.toUpperCase();
-  primaryHex.textContent = state.primaryColor.toUpperCase();
-}
-mainSwatch.addEventListener('input', () => {
-  state.mainColor = mainSwatch.value;
-  mainHex.textContent = state.mainColor.toUpperCase();
-  applyColorOverrides();
-});
-mainSwatch.addEventListener('change', () => persist());
-primarySwatch.addEventListener('input', () => {
-  state.primaryColor = primarySwatch.value;
-  primaryHex.textContent = state.primaryColor.toUpperCase();
-  applyColorOverrides();
-});
-primarySwatch.addEventListener('change', () => persist());
+function applyColorInputs() { applyPaletteSelection(); }
 
 resetBtn.addEventListener('click', () => {
   state.animation    = DEFAULTS.animation;
@@ -1971,7 +1944,7 @@ resetBtn.addEventListener('click', () => {
   applyAnimationSeg();
   applySpeed();
   applyHover();
-  applyColorInputs();
+  applyPaletteSelection();
   applyColorOverrides();
   ensureStrategy();
   updateResults(false);
@@ -1980,6 +1953,7 @@ resetBtn.addEventListener('click', () => {
 
 /* ============ Init ============ */
 renderAxes();
+renderPaletteGrid();
 applyTheme();
 applyColorOverrides();
 applyScatterBtn();
