@@ -94,54 +94,60 @@
   }
 
   /* ============ Responsive size variables ============ */
-  /* Card-title font scales with the card height so titles never get clipped
-     on iOS Safari or narrow MacOS Chrome (per ThePlane Dev notes 2026-05-06). */
+  /* 2026-05-06 R2: Mike's screenshot showed titles still clipping at the
+     "iPhone web app" breakpoint. The fix is two-fold:
+       1. Card heights bumped at every breakpoint so 2-line titles + meta +
+          byline fit with breathing room.
+       2. Plane shrunk meaningfully so the new card height has somewhere to
+          come from (mobile real estate budget is fixed).
+       Title font keeps its size more aggressively (down to 13px not 11.5)
+       so the cards stay readable on small screens. */
   :root {
-    --card-height:    96px;
+    --card-height:    104px;
     --card-title-fs:  14.5px;
     --card-meta-fs:   10px;
     --card-by-fs:     11px;
-    --plane-size:    290px;
-    --radial-size:   240px;
-    --app-pad-top:   28px;
-    --app-pad-bot:   36px;
-    --stack-gap:      16px;
+    --plane-size:    230px;
+    --radial-size:   190px;
+    --app-pad-top:   24px;
+    --app-pad-bot:   32px;
+    --stack-gap:      14px;
   }
   @media (max-height: 820px) {
     :root {
-      --card-height:    86px;
-      --card-title-fs:  13.5px;
-      --plane-size:    255px;
-      --radial-size:   210px;
-      --app-pad-top:   22px;
-      --app-pad-bot:   28px;
+      --card-height:    98px;
+      --card-title-fs:  14px;
+      --plane-size:    195px;
+      --radial-size:   160px;
+      --app-pad-top:   20px;
+      --app-pad-bot:   26px;
       --stack-gap:      12px;
     }
   }
   @media (max-height: 720px) {
     :root {
-      --card-height:    74px;
-      --card-title-fs:  12.5px;
+      --card-height:    90px;
+      --card-title-fs:  13.5px;
       --card-meta-fs:    9.5px;
       --card-by-fs:     10.5px;
-      --plane-size:    215px;
-      --radial-size:   178px;
-      --app-pad-top:   16px;
-      --app-pad-bot:   20px;
-      --stack-gap:       8px;
+      --plane-size:    165px;
+      --radial-size:   136px;
+      --app-pad-top:   14px;
+      --app-pad-bot:   18px;
+      --stack-gap:       9px;
     }
   }
   @media (max-height: 640px) {
     :root {
-      --card-height:    62px;
-      --card-title-fs:  11.5px;
+      --card-height:    84px;
+      --card-title-fs:  12.5px;
       --card-meta-fs:    9px;
       --card-by-fs:     10px;
-      --plane-size:    170px;
-      --radial-size:   140px;
-      --app-pad-top:   12px;
-      --app-pad-bot:   14px;
-      --stack-gap:       6px;
+      --plane-size:    132px;
+      --radial-size:   108px;
+      --app-pad-top:   10px;
+      --app-pad-bot:   12px;
+      --stack-gap:       7px;
     }
   }
 
@@ -270,7 +276,7 @@
     background: linear-gradient(180deg, var(--card-grad-a) 0%, var(--card-grad-b) 100%);
     border: 1px solid var(--surface-stroke);
     border-radius: 12px;
-    padding: 9px 12px 10px;
+    padding: 8px 12px 9px;
     box-shadow: var(--card-shadow);
     width: 100%;
     height: var(--card-height);
@@ -282,7 +288,7 @@
     transition: background 240ms ease, border-color 240ms ease;
   }
   .card:focus-visible { outline: 2px solid var(--plane-dot-high); outline-offset: 2px; }
-  .card-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; min-width: 0; }
+  .card-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; min-width: 0; flex-shrink: 0; }
   .cat-pill {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 2px 7px;
@@ -316,7 +322,7 @@
     min-height: 0;
   }
   .card-byline {
-    margin-top: 4px;
+    margin-top: 3px;
     color: var(--fg-muted);
     font-family: 'IBM Plex Sans', system-ui;
     font-size: var(--card-by-fs);
@@ -1125,12 +1131,38 @@ function loadPoint() {
 function isValidAnim(a) { return a === 'sideswap' || a === 'slide' || a === 'flipboard'; }
 function clampNum(v, lo, hi, fb) { v = Number(v); if (!isFinite(v)) return fb; return Math.max(lo, Math.min(hi, v)); }
 
+/* ---------- Settings migration ----------
+   v2 (2026-05-06): hoverDelay default changed 0 → 50 ms. Existing devices
+   already have plane-hover-delay=0 saved, so without a migration the bumped
+   default never takes effect. Bump plane-settings-v and rewrite. */
+const SETTINGS_VERSION = 2;
+(function migrateSettings() {
+  try {
+    const sv = parseInt(readLS('plane-settings-v', '1'), 10) || 1;
+    if (sv < 2) {
+      const hd = parseFloat(readLS('plane-hover-delay', '0'));
+      if (!isFinite(hd) || hd === 0) {
+        localStorage.setItem('plane-hover-delay', '50');
+      }
+    }
+    localStorage.setItem('plane-settings-v', String(SETTINGS_VERSION));
+  } catch (e) {}
+})();
+
+/* App always opens on the Plane. Card-detail view persists across reload so a
+   tap-then-reload doesn't lose context, but the Settings page should never be
+   restored — reopening should drop the user back at the home plane. */
+function loadInitialView() {
+  const v = readLS('plane-view', 'plane');
+  return (v === 'plane' || v === 'card') ? v : 'plane';
+}
+
 const state = {
   theme: readLS('plane-theme', 'dark'),
   value: loadPoint(),
   scatter: readLS('plane-scatter', '0') === '1',
   hidden:  readLS('plane-hidden',  '0') === '1',
-  view:    readLS('plane-view',    'plane'),
+  view:    loadInitialView(),
   animation: (function() { const a = readLS('plane-animation', DEFAULTS.animation); return isValidAnim(a) ? a : DEFAULTS.animation; })(),
   speed:       clampNum(readLS('plane-speed', String(DEFAULTS.speed)), 0.4, 2.4, DEFAULTS.speed),
   hoverDelay:  clampNum(readLS('plane-hover-delay', String(DEFAULTS.hoverDelay)), 0, 800, DEFAULTS.hoverDelay),
