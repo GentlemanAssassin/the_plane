@@ -35,6 +35,7 @@
 
     --card-grad-a: #141b2c;
     --card-grad-b: #0d1320;
+    --card-back-bg: #1a2236;
     --card-shadow: 0 6px 18px rgba(0,4,20,0.55);
 
     --plane-panel-a: oklch(26% 0.05 220);
@@ -72,6 +73,7 @@
 
     --card-grad-a: #ffffff;
     --card-grad-b: #edf1f8;
+    --card-back-bg: #d8dfeb;
     --card-shadow: 0 2px 10px rgba(10,30,80,0.08);
 
     --plane-panel-a: oklch(92% 0.04 210);
@@ -265,13 +267,6 @@
     position: absolute;
     inset: 0;
   }
-  .result-stack.mode-slide .card-wrap {
-    position: relative;
-    inset: auto;
-    height: var(--card-height);
-    will-change: transform, opacity;
-  }
-
   .card {
     background: linear-gradient(180deg, var(--card-grad-a) 0%, var(--card-grad-b) 100%);
     border: 1px solid var(--surface-stroke);
@@ -469,7 +464,7 @@
     to   { transform: translateX(0); opacity: 1; }
   }
 
-  /* ============ Flipboard (full-card single-axis flip) ============ */
+  /* ============ Flipboard (double-flip with blank backside) ============ */
   .slot.flip-slot { perspective: 1400px; }
   .flip-container {
     position: absolute;
@@ -486,6 +481,12 @@
     backface-visibility: hidden;
   }
   .flip-back { transform: rotateX(180deg); }
+  /* Blank back card — solid color, no content, just the card chrome shape. */
+  .card.flip-blank-back {
+    background: var(--card-back-bg);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--surface-stroke);
+  }
 
   /* ============ Hide / restore ============ */
   body[data-plane-hidden="1"] .plane-panel { display: none; }
@@ -923,7 +924,6 @@
           </div>
           <div class="segmented" id="animationSeg" role="radiogroup">
             <span class="seg-thumb"></span>
-            <button type="button" data-value="slide"     role="radio">Slide</button>
             <button type="button" data-value="flipboard" role="radio">Flip</button>
             <button type="button" data-value="sideswap"  role="radio">Swap</button>
           </div>
@@ -1037,7 +1037,11 @@ const DIM = {
 
 const DEFAULTS = {
   animation: 'sideswap',
-  speed: 1.2,
+  speed: 1.2,                                   // legacy single-speed default
+  speedByAnimation: {                           // each animation has its own
+    sideswap: 1.2,
+    flipboard: 0.8,
+  },
   hoverDelay: 50,
   mainColor: '#0E1A2E',   // Primary (Midnight)
   primaryColor: '#7BE0FF', // Secondary (Midnight)
@@ -1065,13 +1069,12 @@ function findPaletteIndex(primaryHex, secondaryHex) {
 
 // Base durations (ms). Divided by state.speed at animation time.
 const BASE = {
-  flipDur: 900,        // total flip duration
+  flipHalfDur: 450,    // each half of the double flip — total runtime ~900ms × 2 phases
+  flipPause:    40,    // brief beat between the two halves
   sideswapExit:  360,
   sideswapEnter: 420,
   sideswapGap:    80,
   sideswapStagger: 130,
-  slideMove: 480,
-  slideFade: 360,
 };
 
 /* ============ Glyphs ============ */
@@ -1128,14 +1131,18 @@ function loadPoint() {
   } catch (e) {}
   return { x: 0.5, y: 0.5 };
 }
-function isValidAnim(a) { return a === 'sideswap' || a === 'slide' || a === 'flipboard'; }
+function isValidAnim(a) { return a === 'sideswap' || a === 'flipboard'; }
 function clampNum(v, lo, hi, fb) { v = Number(v); if (!isFinite(v)) return fb; return Math.max(lo, Math.min(hi, v)); }
 
 /* ---------- Settings migration ----------
    v2 (2026-05-06): hoverDelay default changed 0 → 50 ms. Existing devices
-   already have plane-hover-delay=0 saved, so without a migration the bumped
-   default never takes effect. Bump plane-settings-v and rewrite. */
-const SETTINGS_VERSION = 2;
+     already had plane-hover-delay=0 saved, so without a migration the bumped
+     default never takes effect.
+   v3 (2026-05-06): Slide animation removed; speed becomes per-animation.
+     Any saved 'slide' selection coerces to 'sideswap'. Existing single
+     plane-speed value is folded into the new plane-speeds JSON map under
+     whichever animation is currently active. */
+const SETTINGS_VERSION = 3;
 (function migrateSettings() {
   try {
     const sv = parseInt(readLS('plane-settings-v', '1'), 10) || 1;
@@ -1145,9 +1152,44 @@ const SETTINGS_VERSION = 2;
         localStorage.setItem('plane-hover-delay', '50');
       }
     }
+    if (sv < 3) {
+      let savedAnim = readLS('plane-animation', DEFAULTS.animation);
+      if (savedAnim === 'slide') {
+        savedAnim = DEFAULTS.animation;
+        localStorage.setItem('plane-animation', savedAnim);
+      }
+      // Fold the legacy single speed into the new per-animation map.
+      const legacySpeed = parseFloat(readLS('plane-speed', String(DEFAULTS.speed)));
+      const seedMap = Object.assign({}, DEFAULTS.speedByAnimation);
+      if (isFinite(legacySpeed) && legacySpeed > 0 && (savedAnim in seedMap)) {
+        seedMap[savedAnim] = legacySpeed;
+      }
+      // Preserve anything already in plane-speeds (idempotent).
+      try {
+        const existing = JSON.parse(readLS('plane-speeds', '{}'));
+        for (const k in existing) {
+          const v = parseFloat(existing[k]);
+          if (isFinite(v) && v >= 0.4 && v <= 2.4) seedMap[k] = v;
+        }
+      } catch (e) {}
+      localStorage.setItem('plane-speeds', JSON.stringify(seedMap));
+    }
     localStorage.setItem('plane-settings-v', String(SETTINGS_VERSION));
   } catch (e) {}
 })();
+
+/* Read the per-animation speed map back. Always returns a sane object. */
+function loadSpeedMap() {
+  let raw;
+  try { raw = JSON.parse(readLS('plane-speeds', '{}')); }
+  catch (e) { raw = {}; }
+  const out = Object.assign({}, DEFAULTS.speedByAnimation);
+  for (const k of ['sideswap', 'flipboard']) {
+    const v = parseFloat(raw[k]);
+    if (isFinite(v)) out[k] = clampNum(v, 0.4, 2.4, DEFAULTS.speedByAnimation[k]);
+  }
+  return out;
+}
 
 /* App always opens on the Plane. Card-detail view persists across reload so a
    tap-then-reload doesn't lose context, but the Settings page should never be
@@ -1164,7 +1206,7 @@ const state = {
   hidden:  readLS('plane-hidden',  '0') === '1',
   view:    loadInitialView(),
   animation: (function() { const a = readLS('plane-animation', DEFAULTS.animation); return isValidAnim(a) ? a : DEFAULTS.animation; })(),
-  speed:       clampNum(readLS('plane-speed', String(DEFAULTS.speed)), 0.4, 2.4, DEFAULTS.speed),
+  speeds:      loadSpeedMap(),
   hoverDelay:  clampNum(readLS('plane-hover-delay', String(DEFAULTS.hoverDelay)), 0, 800, DEFAULTS.hoverDelay),
   mainColor:    readLS('plane-main',    DEFAULTS.mainColor),
   primaryColor: readLS('plane-primary', DEFAULTS.primaryColor),
@@ -1179,6 +1221,20 @@ const state = {
   expandedId: readLS('plane-expanded-id', '') || null,
 };
 
+// state.speed is a derived view of the current animation's stored speed.
+// Reads pull from state.speeds[state.animation]; writes update that slot.
+Object.defineProperty(state, 'speed', {
+  get() {
+    const v = this.speeds && this.speeds[this.animation];
+    return isFinite(v) ? v : DEFAULTS.speedByAnimation[this.animation] || DEFAULTS.speed;
+  },
+  set(v) {
+    const c = clampNum(v, 0.4, 2.4, DEFAULTS.speedByAnimation[this.animation] || DEFAULTS.speed);
+    if (!this.speeds) this.speeds = {};
+    this.speeds[this.animation] = c;
+  },
+});
+
 function persist() {
   try {
     localStorage.setItem('plane-theme',       state.theme);
@@ -1188,7 +1244,7 @@ function persist() {
     localStorage.setItem('plane-view',        state.view);
     localStorage.setItem('plane-expanded-id', state.expandedId || '');
     localStorage.setItem('plane-animation',   state.animation);
-    localStorage.setItem('plane-speed',       String(state.speed));
+    localStorage.setItem('plane-speeds',      JSON.stringify(state.speeds || {}));
     localStorage.setItem('plane-hover-delay', String(state.hoverDelay));
     localStorage.setItem('plane-main',        state.mainColor);
     localStorage.setItem('plane-primary',     state.primaryColor);
@@ -1268,6 +1324,13 @@ function fillFlipFace(faceEl, item, dist) {
   card.tabIndex = 0;
   card.innerHTML = cardInnerHTML(item, dist);
   attachCardHandlers(card, item);
+  faceEl.appendChild(card);
+}
+function fillFlipFaceBlank(faceEl) {
+  faceEl.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'card flip-blank-back';
+  card.setAttribute('aria-hidden', 'true');
   faceEl.appendChild(card);
 }
 
@@ -1355,83 +1418,17 @@ const STRAT = {
     },
   },
 
-  /* ---------- Slide: FLIP reorder + new-card fade-in ---------- */
-  slide: {
-    setup(n) {
-      clearAllTimers();
-      const el = stack();
-      el.className = 'result-stack mode-slide';
-      el.innerHTML = '';
-    },
-    update(animate) {
-      const SPD = state.speed;
-      const MOVE_DUR = BASE.slideMove / SPD;
-      const FADE_DUR = BASE.slideFade / SPD;
-      const el = stack();
-      const top = topN(currentCount);
-
-      const oldRects = new Map();
-      for (const child of el.children) {
-        const id = child.dataset.itemId;
-        if (id) oldRects.set(id, child.getBoundingClientRect());
-      }
-      const existing = new Map();
-      for (const child of Array.from(el.children)) {
-        const id = child.dataset.itemId;
-        if (id) existing.set(id, child);
-      }
-
-      while (el.firstChild) el.removeChild(el.firstChild);
-      const isNew = new Set();
-      for (const t of top) {
-        const id = t.item.id;
-        let card;
-        if (existing.has(id)) {
-          card = existing.get(id);
-          const dist = card.querySelector('.card-dist');
-          if (dist) dist.textContent = '· ' + Math.round(t.d);
-        } else {
-          card = buildCard(t.item, t.d);
-          isNew.add(id);
-        }
-        card.style.transition = 'none';
-        card.style.transform  = '';
-        card.style.opacity    = '';
-        el.appendChild(card);
-      }
-
-      if (!animate) return;
-
-      for (const child of el.children) {
-        const id = child.dataset.itemId;
-        const newRect = child.getBoundingClientRect();
-        const oldRect = oldRects.get(id);
-        if (oldRect) {
-          const dy = oldRect.top - newRect.top;
-          if (Math.abs(dy) > 0.5) {
-            child.style.transition = 'none';
-            child.style.transform = `translateY(${dy}px)`;
-            void child.offsetWidth;
-            child.style.transition = `transform ${MOVE_DUR}ms cubic-bezier(.22,1,.36,1), opacity ${FADE_DUR}ms`;
-            child.style.transform = 'translateY(0)';
-          }
-        } else if (isNew.has(id)) {
-          child.style.transition = 'none';
-          child.style.transform  = 'translateY(-14px)';
-          child.style.opacity    = '0';
-          void child.offsetWidth;
-          child.style.transition = `transform ${MOVE_DUR}ms cubic-bezier(.22,1,.36,1), opacity ${FADE_DUR}ms`;
-          child.style.transform  = 'translateY(0)';
-          child.style.opacity    = '1';
-        }
-      }
-    },
-    teardown() {
-      stack().innerHTML = '';
-    },
-  },
-
-  /* ---------- Flipboard: full-card single-axis rotateX flip ---------- */
+  /* ---------- Flipboard: double rotateX flip with blank backside ----------
+     Phase A: rotateX(0)  → rotateX(180). User sees OLD card flip away to
+              reveal the BLANK back side. Front holds OLD; back is blank.
+     Phase B: rotateX(180) → rotateX(360). User sees BLANK back flip away
+              to reveal the NEW card. We swap the front content from OLD to
+              NEW at the start of phase B, while it's facing away from the
+              viewer (so the swap is invisible). At rotateX(360), the front
+              face is visible again, now showing NEW.
+     After both phases settle, snap the container back to rotateX(0) (no
+     transition) so the next flip starts from a clean state. The snap is
+     visually identical because rotateX(360) ≡ rotateX(0).                  */
   flipboard: {
     setup(n) {
       clearAllTimers();
@@ -1453,7 +1450,8 @@ const STRAT = {
     },
     update(animate) {
       const SPD = state.speed;
-      const DUR = BASE.flipDur / SPD;
+      const HALF = BASE.flipHalfDur / SPD;
+      const PAUSE = BASE.flipPause;          // not divided by speed — just a beat
       const top = topN(currentCount);
 
       for (let i = 0; i < currentCount; i++) {
@@ -1468,7 +1466,7 @@ const STRAT = {
         if (!t) {
           slot.timers.forEach(clearTimeout); slot.timers = [];
           fillFlipFace(front, null);
-          fillFlipFace(back,  null);
+          fillFlipFaceBlank(back);
           container.style.transition = 'none';
           container.style.transform  = 'rotateX(0deg)';
           slot.id = null;
@@ -1479,7 +1477,7 @@ const STRAT = {
         if (!animate || !slot.id) {
           slot.timers.forEach(clearTimeout); slot.timers = [];
           fillFlipFace(front, t.item, t.d);
-          fillFlipFace(back,  null);
+          fillFlipFaceBlank(back);
           container.style.transition = 'none';
           container.style.transform  = 'rotateX(0deg)';
           slot.id = incomingId;
@@ -1487,35 +1485,41 @@ const STRAT = {
         }
         if (slot.id === incomingId) continue;
 
-        // Cancel any in-flight flip on this slot, snap to a clean rest state
-        // (front showing whatever slot.id was), then start the new flip.
+        // Cancel any in-flight flip on this slot, snap to clean rest state.
         slot.timers.forEach(clearTimeout); slot.timers = [];
         const displayed = PLANE_ITEMS.find(p => p.id === slot.id);
-        fillFlipFace(front, displayed || null, null);
-        fillFlipFace(back,  t.item, t.d);
+        fillFlipFace(front, displayed || null, null);  // front: OLD
+        fillFlipFaceBlank(back);                        // back:  BLANK
         container.style.transition = 'none';
         container.style.transform  = 'rotateX(0deg)';
-        // force layout flush so the new transition picks up from 0deg
-        void container.offsetHeight;
+        void container.offsetHeight;  // layout flush
 
-        // Start the rotation. Single-axis 180-degree flip; backface-hidden on
-        // each face means the front fades away as it crosses 90deg and the
-        // back appears on the other side.
-        container.style.transition = `transform ${DUR}ms cubic-bezier(.45, .05, .25, 1)`;
-        // requestAnimationFrame to make sure the transition kicks in
+        // Phase A: rotateX(0) → rotateX(180), revealing the BLANK back.
+        container.style.transition = `transform ${HALF}ms cubic-bezier(.45, .05, .25, 1)`;
         requestAnimationFrame(() => {
           container.style.transform = 'rotateX(180deg)';
         });
 
-        // After the rotation, copy the back into the front and reset the
-        // container, so the next flip starts from rotateX(0) again.
+        // At HALF ms (front is now hidden, facing away): swap front to NEW.
+        const tSwap = setTimeout(() => {
+          fillFlipFace(front, t.item, t.d);
+        }, HALF);
+
+        // At HALF + PAUSE ms: kick phase B, rotateX(180) → rotateX(360),
+        // revealing the NEW card.
+        const tPhaseB = setTimeout(() => {
+          container.style.transform = 'rotateX(360deg)';
+        }, HALF + PAUSE);
+
+        // After both phases: reset container to rotateX(0) (visually
+        // identical to 360) and re-blank the back, ready for next flip.
         const tEnd = setTimeout(() => {
           fillFlipFace(front, t.item, t.d);
-          fillFlipFace(back,  null);
+          fillFlipFaceBlank(back);
           container.style.transition = 'none';
           container.style.transform  = 'rotateX(0deg)';
-        }, DUR + 30);
-        slot.timers.push(tEnd);
+        }, HALF + PAUSE + HALF + 30);
+        slot.timers.push(tSwap, tPhaseB, tEnd);
         slot.id = incomingId;
       }
     },
@@ -1940,16 +1944,19 @@ animationSeg.addEventListener('click', (e) => {
   if (!isValidAnim(v) || v === state.animation) return;
   state.animation = v;
   applyAnimationSeg();
+  applySpeed();   // slider snaps to this animation's stored speed
   ensureStrategy();
   updateResults(false);
   persist();
 });
 
 function applySpeed() {
+  // state.speed reads through the per-animation map via the getter above.
   speedSlider.value = String(state.speed);
   speedValue.textContent = state.speed.toFixed(1) + 'x';
 }
 speedSlider.addEventListener('input', () => {
+  // Setter on state.speed routes the value to state.speeds[state.animation].
   state.speed = parseFloat(speedSlider.value);
   speedValue.textContent = state.speed.toFixed(1) + 'x';
 });
@@ -1969,7 +1976,7 @@ function applyColorInputs() { applyPaletteSelection(); }
 
 resetBtn.addEventListener('click', () => {
   state.animation    = DEFAULTS.animation;
-  state.speed        = DEFAULTS.speed;
+  state.speeds       = Object.assign({}, DEFAULTS.speedByAnimation);
   state.hoverDelay   = DEFAULTS.hoverDelay;
   state.mainColor    = DEFAULTS.mainColor;
   state.primaryColor = DEFAULTS.primaryColor;
