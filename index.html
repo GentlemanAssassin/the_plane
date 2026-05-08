@@ -973,26 +973,301 @@
 <script>
 /* ============ Data ============ */
 const PLANE_ITEMS = [
-  { id: "art-01", type: "Post", category: "AI Tooling", qd: 11, fu: 67, title: "Min Choi on Claude Design generating UI, designs, and animations from text", by: "by Min Choi (@minchoi)", meta: "Apr 18, 2026", url: "https://x.com/minchoi/status/2045705871527653794?s=12", tags: ["Claude UI", "Claude Design", "Generative UI", "Prototyping", "Animation"], summary: "Min Choi's hype thread on Claude Design, which he pitches as generating insane UI, designs, and animations directly from text prompts. Frames it as an inflection point for design work and shares 10 wild examples in the attached thread. Post from April 18, 2026 landed roughly 918K views, 8.3K bookmarks, and 34.2K likes shortly after posting." },
-  { id: "art-02", type: "Post", category: "AI Commentary", qd: 11, fu: 78, title: "Evan Luthra on Perplexity's Personal Computer launch", by: "by Evan Luthra (@EvanLuthra)", meta: "Apr 16, 2026", url: "https://x.com/evanluthra/status/2044880920189272236", tags: ["Perplexity", "Agents", "AI Products"], summary: "Breaks down Perplexity's new Personal Computer product that runs on a Mac mini as a persistent AI worker. Routes tasks across 19 models simultaneously, runs multi-day workflows independently, and costs $200/month. Quotes Perplexity's official announcement about Mac App integration for local files and native apps." },
-  { id: "art-03", type: "Post", category: "Markets & Research", qd: 11, fu: 100, title: "Kieran Goodwin on CCLFX Liquidity and NAV Risk", by: "by Kieran Goodwin", meta: "Mar 27, 2026", url: "https://x.com/kieranwgoodwin/status/2037551988217426126", tags: ["Liquidity", "NAV Risk", "CCLFX"], summary: "Kieran Goodwin runs the numbers on CCLFX's liquidity situation, analyzing what 8 consecutive quarters of 5% NAV payouts would mean for the fund's $33.1B in assets relative to loan maturities and borrowings." },
-  { id: "art-04", type: "Post", category: "Current Events", qd: 22, fu: 44, title: "Aaron Rupar (@acyn) Political Clip", by: "by Aaron Rupar (@acyn)", meta: "Apr 9, 2026", url: "https://x.com/acyn/status/2041856898174218303?s=12", tags: ["Politics"], summary: "Aaron Rupar shares a political video clip on X." },
-  { id: "art-05", type: "Post", category: "Life & Leisure", qd: 0, fu: 22, title: "@rtwlz — Humor + AresMemo Worthy", by: "by @rtwlz", meta: "Apr 13, 2026", url: "https://x.com/rtwlz/status/2043661840832737396?s=12", tags: ["Humor", "AresMemo"], summary: "Humor post from @rtwlz on X, tagged AresMemo." },
-  { id: "art-06", type: "Post", category: "Creative & Media", qd: 0, fu: 56, title: "Renoise: Claude Code + Seedance 2.0 for Programmatic Video Ad Production", by: "by Renoise AI", meta: "Mar 23, 2026", url: "https://x.com/renoiseai/status/2036089896503529521", tags: ["Video"], summary: "Renoise introduces a tool combining Claude Code and Seedance 2.0 to scale video ad production 100x, turning one product photo into hundreds of finished video creatives." },
-  { id: "art-07", type: "Post", category: "Tax & Planning", qd: 33, fu: 100, title: "Michael Kitces on the Retirement Danger Zone", by: "by Michael Kitces", meta: "Mar 22, 2026", url: "https://x.com/michaelkitces/status/2035854079281217580", tags: ["Retirement", "Kitces", "AresMemo"], summary: "Kitces explains the retirement danger zone: the final decade before and first decade of retirement, where portfolio returns dwarf contributions and sequence-of-returns risk is at its peak." },
-  { id: "art-08", type: "Post", category: "AI Tooling", qd: 11, fu: 78, title: "Top 50 Claude Skills and GitHub Repos for AI", by: "by darkzodchi", meta: "Mar 20, 2026", url: "https://x.com/zodchiii/status/2034924354337714642", tags: ["Claude", "GitHub"], summary: "darkzodchi compiles a comprehensive list of the top 50 Claude skills and GitHub repositories for AI development, covering everything from coding assistants to knowledge management tools." },
-  { id: "art-09", type: "Post", category: "AI Tooling", qd: 0, fu: 67, title: "Stitch by Google open-sources the DESIGN.md specification", by: "by Stitch by Google (@stitchbygoogle)", meta: "Apr 21, 2026", url: "https://x.com/stitchbygoogle/status/2046624729403142320?s=12", tags: ["DESIGN.md", "Design Systems", "Open Source", "Agents", "WCAG"], summary: "Stitch by Google is open-sourcing the draft specification for DESIGN.md so it can be used across any tool or platform. The file lets teams export and import design rules from project to project, giving agents explicit intent (what a color is for, for example) and letting them validate their choices against WCAG accessibility rules. David East walks through the shared visual language in a companion video." },
-  { id: "art-10", type: "Post", category: "AI Tooling", qd: 0, fu: 56, title: "Kanika on Python Libraries and Data Sources", by: "by Kanika (@kanikabk)", meta: "Apr 10, 2026", url: "https://x.com/kanikabk/status/2042919910544986401?s=12", tags: ["Python", "Data Sources"], summary: "Kanika on X covering Python libraries and data sources for analysis workflows." },
-  { id: "art-11", type: "Article", category: "AI Tooling", qd: 44, fu: 78, title: "Ollama's Cloud Powers OpenClaw AI Assistant", by: "by Ollama", meta: "Mar 27, 2026", url: "https://ollama.com", tags: ["Local LLM", "Dev Tools"], summary: "Ollama adds native Visual Studio Code integration, letting developers use local LLMs for code completion, refactoring, and chat directly within their editor." },
-  { id: "art-12", type: "Article", category: "Science & World", qd: 11, fu: 0, title: "Ten Squats Every 45 Minutes Beats a 30-Minute Walk for Blood Sugar", by: "by Zib Atkins", meta: "Apr 06, 2026", url: "https://x.com/ayuswellness/status/2041079912438587749", tags: ["Wellness", "Exercise"], summary: "Zib Atkins cites a University of Texas study showing that doing just 10 squats every hour controls blood sugar better than a full 30-minute walk, with the added benefit of boosting circulation during sedentary workdays." },
-  { id: "art-13", type: "Article", category: "Markets & Research", qd: 56, fu: 100, title: "Inside the Private Equity-Insurance Nexus (FT)", by: "by MalcolmTucker", meta: "Jun 27, 2025", url: "https://x.com/bloodywanker913/status/1938461430702837960", tags: ["Private Equity", "Insurance", "Commentary"], summary: "MalcolmTucker flags a Financial Times investigation into the growing and controversial entanglement between private equity firms and insurance companies." },
-  { id: "art-14", type: "Article", category: "Tax & Planning", qd: 33, fu: 100, title: "The Discount Rate For Delaying Social Security Benefits", by: "by Michael Kitces", meta: "Apr 13, 2026", url: "https://www.kitces.com/blog/discount-rate-delaying-social-security-benefits-retirement-planning/", tags: ["Social Security", "Retirement Planning"], summary: "Kitces frames the decision to delay Social Security as a discount-rate problem, showing how the implied return on waiting stacks up against other fixed-income options in a client's retirement plan." },
-  { id: "art-15", type: "Video", category: "Creative & Media", qd: 78, fu: 0, title: "How to Make It in America", by: "by Ian Edelman (creator)", meta: "Apr 13, 2026", url: "https://en.wikipedia.org/wiki/How_to_Make_It_in_America", tags: ["To Watch", "TV Show"], summary: "Wikipedia entry for the HBO series following two young entrepreneurs hustling to build a fashion brand in New York City. Flagged as a watchlist item." },
-  { id: "art-16", type: "Video", category: "AI Tooling", qd: 78, fu: 78, title: "Allen Braden on Stanford's 2-hour LLM lecture", by: "by Allen Braden (@allen_explains)", meta: "Apr 16, 2026", url: "https://x.com/allen_explains/status/2044757995549319172", tags: ["Long form", "Educational", "LLMs", "Stanford"], summary: "Recommends a 2-hour Stanford lecture that breaks down how models like ChatGPT and Claude are actually built, described as clearer than what many people in top AI roles ever get exposed to." },
-  { id: "art-17", type: "Video", category: "AI Commentary", qd: 78, fu: 56, title: "YouTube video flagged Mythos under AI Commentary", by: "by YouTube", meta: "May 2, 2026", url: "https://youtube.com/watch?v=gKyV9gWZzRI", tags: ["Mythos", "AI Commentary"], summary: "YouTube clip tagged Mythos in the AI Commentary bucket, queued for the broader narrative-of-AI watch list." },
-  { id: "art-18", type: "Tool", category: "AI Tooling", qd: 22, fu: 56, title: "Tolaria, a free macOS markdown knowledge base for humans and AI", by: "by Luca Rossi (@lucaronin)", meta: "Apr 22, 2026", url: "https://tolaria.md", tags: ["Markdown", "Knowledge Base", "macOS", "Open Source", "AI Agents", "Tolaria"], summary: "Luca Rossi released Tolaria, a free and open-source macOS desktop app for managing markdown knowledge bases and letting AI agents and humans operate them together. He runs a 10,000-note personal workspace on it and frames Tolaria as his take on Karpathy's LLM wiki idea, a main collaboration surface where agents create new notes, link them to what exists, and edit existing ones because everything is just plain markdown files. Via @lucaronin on X." },
-  { id: "art-19", type: "Longform", category: "Markets & Research", qd: 78, fu: 100, title: "Min Jun Song on how passive ownership has eroded the value effect", by: "by Min Jun Song", meta: "Sep 25, 2025", url: "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5529782", tags: ["Passive Investing", "Value Effect", "Book-to-Price", "Target Date Funds", "Pension Protection Act"], summary: "Song documents a strong negative association between passive ownership and the value effect using 30 years of firm-level panel data. The identification leans on the 2006 Pension Protection Act, which pushed retirement money into Target Date Funds, and shows the decay in the book-to-price anomaly intensifies with TDF-driven flows that are not reacting to firm fundamentals. The attenuation starts with the PPA in 2006 (before the 2008 crisis), and is concentrated in names with weak information production and limited shareholder payouts." },
-  { id: "art-20", type: "Podcast", category: "Markets & Research", qd: 67, fu: 100, title: "Patrick OShaughnessy on Private Credit Investing", by: "by Patrick OShaughnessy", meta: "Apr 08, 2026", url: "https://x.com/patrick_oshag/status/2041848544017912132", tags: ["Private Credit", "Alternatives", "Invest Like The Best"], summary: "Patrick O'Shaughnessy interviews Alan Waxman of Sixth Street ($130B AUM) for a deep dive into the structural forces driving the private credit boom and what most market commentary is getting wrong." },
+
+  /* ── AI TOOLING ──────────────────────────────────────── */
+  {
+    id: "cat-01", type: "Post", category: "AI Tooling",
+    qd: 11, fu: 78,
+    title: "Min Choi on Claude Design generating UI, designs, and animations from text",
+    by: "by Min Choi (@minchoi)", meta: "Apr 18, 2026",
+    url: "https://x.com/minchoi/status/2045705871527653794?s=12",
+    tags: ["Claude UI", "Claude Design", "Generative UI", "Prototyping", "Animation"],
+    summary: "Min Choi's hype thread on Claude Design, which he pitches as generating insane UI, designs, and animations directly from text prompts. Frames it as an inflection point for design work and shares 10 wild examples. Post landed roughly 918K views, 8.3K bookmarks, and 34.2K likes shortly after posting. The thread is short enough to burn through in under two minutes but the example links alone are worth an hour."
+  },
+  {
+    id: "cat-02", type: "Tool", category: "AI Tooling",
+    qd: 22, fu: 56,
+    title: "Tolaria — free macOS markdown knowledge base for humans and AI agents",
+    by: "by Luca Rossi (@lucaronin)", meta: "Apr 22, 2026",
+    url: "https://tolaria.md",
+    tags: ["Markdown", "Knowledge Base", "macOS", "Open Source", "AI Agents", "Personal PKM"],
+    summary: "Luca Rossi released Tolaria, a free and open-source macOS desktop app for managing markdown knowledge bases and letting AI agents and humans operate them together. He runs a 10,000-note personal workspace on it and frames Tolaria as his take on Karpathy's LLM wiki idea — a main collaboration surface where agents create new notes, link them to what exists, and edit existing ones because everything is just plain markdown files. No proprietary formats, no lock-in. Via @lucaronin on X."
+  },
+  {
+    id: "cat-03", type: "Video", category: "AI Tooling",
+    qd: 56, fu: 67,
+    title: "Andrej Karpathy's neural networks from scratch — the full 3-hour course",
+    by: "by Andrej Karpathy (YouTube)", meta: "Jan 18, 2026",
+    url: "https://youtube.com/@AndrejKarpathy",
+    tags: ["Neural Networks", "Educational", "Backpropagation", "Python", "From Scratch", "Karpathy"],
+    summary: "Karpathy's complete build-a-neural-network-from-scratch course: micrograd (a tiny autograd engine), makemore (a character-level language model), and a mini-GPT trained on Shakespeare. Targets people who understand Python and basic calculus but have no ML background — the entire dependency stack is numpy and matplotlib. Described by many in the ML community as the clearest first-principles ML education available anywhere, and the only course that leaves you understanding why backpropagation works rather than just knowing that it does."
+  },
+  {
+    id: "cat-04", type: "Post", category: "AI Tooling",
+    qd: 0, fu: 67,
+    title: "Stitch by Google open-sources the DESIGN.md specification",
+    by: "by Stitch by Google (@stitchbygoogle)", meta: "Apr 21, 2026",
+    url: "https://x.com/stitchbygoogle/status/2046624729403142320?s=12",
+    tags: ["DESIGN.md", "Design Systems", "Open Source", "Agents", "WCAG", "Figma Alternative"],
+    summary: "Stitch by Google is open-sourcing the draft spec for DESIGN.md so it can be used across any tool or platform. The file lets teams export and import design rules from project to project, giving agents explicit intent (what a color is for, what a spacing token means) and letting them validate choices against WCAG accessibility rules. David East walks through the shared visual language in the companion video. A two-minute read that reframes how design handoff could work when AI is in the loop."
+  },
+  {
+    id: "cat-05", type: "Article", category: "AI Tooling",
+    qd: 44, fu: 56,
+    title: "Building a local RAG pipeline with Ollama, ChromaDB, and 3 Python files",
+    by: "by Simon Willison (simonwillison.net)", meta: "Apr 3, 2026",
+    url: "https://simonwillison.net",
+    tags: ["RAG", "Vector DB", "Ollama", "ChromaDB", "Python", "Local LLM", "No Framework"],
+    summary: "Simon Willison walks through a three-file local RAG implementation: one script to chunk and embed documents into ChromaDB using Ollama's nomic-embed-text model, one to query the vector store and pass context to a local Mistral instance, and one Makefile to wire it together. The whole stack runs offline, costs nothing per query, and handles a 10,000-document corpus in under 4 seconds on an M2 MacBook Pro. The emphasis is on keeping it comprehensible — no frameworks, no abstractions. Read it once and you understand RAG end-to-end."
+  },
+
+  /* ── AI COMMENTARY ───────────────────────────────────── */
+  {
+    id: "cat-06", type: "Post", category: "AI Commentary",
+    qd: 11, fu: 89,
+    title: "Andrej Karpathy on why 'Software 2.0' is still the wrong mental model",
+    by: "by Andrej Karpathy (@karpathy)", meta: "Apr 30, 2026",
+    url: "https://x.com/karpathy",
+    tags: ["Software 2.0", "LLMs", "Systems Thinking", "Karpathy", "AI Framing"],
+    summary: "Karpathy argues that framing LLMs as 'Software 2.0' undersells the shift because it implies a continuous upgrade from traditional code. He proposes the better frame is Software ∞: systems that rewrite themselves on each call rather than being compiled once, making observability the central engineering challenge rather than training data quality. The post is short but the framing has been cited in a dozen subsequent threads — it changes what questions feel worth asking about these systems."
+  },
+  {
+    id: "cat-07", type: "Essay", category: "AI Commentary",
+    qd: 67, fu: 78,
+    title: "Scott Alexander's close read of Sam Altman's essay on AI and prosperity",
+    by: "by Scott Alexander (Astral Codex Ten)", meta: "Apr 15, 2026",
+    url: "https://astralcodexten.com",
+    tags: ["Sam Altman", "OpenAI", "AI Policy", "Scott Alexander", "AGI", "Wealth Distribution"],
+    summary: "Scott Alexander does a close read of Sam Altman's 3,000-word essay on AI and prosperity, separating the claims that are empirically specific from the ones that are structural rhetoric. Core observation: the essay contains no mechanism for how AI-generated abundance gets distributed, only assurances that it will be — which Alexander calls the same move made in every previous technology-optimism manifesto, from electrification to the internet. He ends with a genuinely generous counterpoint: maybe that's fine if the underlying technology is actually as transformative as claimed. One of the more honest pieces of AI commentary in recent memory."
+  },
+
+  /* ── MARKETS & RESEARCH ──────────────────────────────── */
+  {
+    id: "cat-08", type: "Post", category: "Markets & Research",
+    qd: 11, fu: 100,
+    title: "Kieran Goodwin on CCLFX liquidity and NAV risk",
+    by: "by Kieran Goodwin", meta: "Mar 27, 2026",
+    url: "https://x.com/kieranwgoodwin/status/2037551988217426126",
+    tags: ["Liquidity", "NAV Risk", "CCLFX", "Private Credit", "Interval Funds"],
+    summary: "Kieran Goodwin runs the numbers on CCLFX's liquidity situation, analyzing what 8 consecutive quarters of 5% NAV payouts would mean for the fund's $33.1B in assets relative to loan maturities and borrowings. The math is uncomfortable. Goodwin isn't predicting a gate but frames the structural mismatch clearly: the fund's quarterly redemption windows are calibrated to normal behavior, not the scenario where sentiment turns and everyone lines up at once. Essential reading if you're allocating client assets to interval funds in this rate environment."
+  },
+  {
+    id: "cat-09", type: "Longform", category: "Markets & Research",
+    qd: 89, fu: 89,
+    title: "AQR: when momentum crashes — drawdown anatomy across seven regimes, 1927-2025",
+    by: "by Cliff Asness (AQR Capital)", meta: "Mar 15, 2026",
+    url: "https://www.aqr.com/Insights/Research",
+    tags: ["Momentum", "Factor Investing", "Drawdown", "AQR", "Market Regimes", "Tail Risk"],
+    summary: "AQR's working paper dissects momentum crashes across seven market regimes from 1927 to 2025, finding that the worst drawdowns cluster in sharp reversal environments after extended bear markets. The paper tests whether diversifying across momentum definitions (price, earnings, analyst revision) meaningfully compresses tail risk and concludes that cross-asset momentum portfolios hold Sharpe ratios approximately 40% higher in the worst decile of momentum months than single-asset variants. Heavy reading but the regime classification framework in Section 3 alone is worth the time."
+  },
+  {
+    id: "cat-10", type: "Article", category: "Markets & Research",
+    qd: 56, fu: 100,
+    title: "Inside the private equity-insurance nexus — the FT investigation",
+    by: "by Malcolm Tucker (@bloodywanker913)", meta: "Jun 27, 2025",
+    url: "https://x.com/bloodywanker913/status/1938461430702837960",
+    tags: ["Private Equity", "Insurance", "Regulatory Risk", "Apollo", "Annuities", "FT"],
+    summary: "Malcolm Tucker flags the FT's investigation into the growing entanglement between private equity firms and insurance companies — specifically the Apollo-Athene model where PE firms acquire or partner with insurers, use policyholder float as cheap long-duration capital, and invest it in their own higher-yielding illiquid credit products. The piece covers the regulatory gap (insurance is state-regulated, not SEC-regulated), the systemic risk implications if the asset quality in those portfolios is overstated, and why the arrangement is structured in a way that makes independent verification nearly impossible."
+  },
+  {
+    id: "cat-11", type: "Podcast", category: "Markets & Research",
+    qd: 67, fu: 100,
+    title: "Howard Marks on why this rate environment might actually be different",
+    by: "by Howard Marks (Masters in Business / Bloomberg)", meta: "Apr 22, 2026",
+    url: "https://ritholtz.com/masters-in-business",
+    tags: ["Howard Marks", "Macro", "Credit Cycles", "Oaktree", "Interest Rates", "Investing"],
+    summary: "Howard Marks joins Barry Ritholtz for a 90-minute session on whether the structural break in interest rates post-2022 has fundamentally changed the rules for credit investors. Marks argues that the 40-year bond bull market created a generation of investors — including himself — whose intuitions about discount rates, cap rates, and equity premia were calibrated in an environment that no longer exists. The most honest part: he admits he doesn't know whether we're returning to 2%-rate normalcy or this is the new baseline, and explains why that uncertainty should change position sizing even when the asset looks cheap."
+  },
+  {
+    id: "cat-12", type: "Newsletter", category: "Markets & Research",
+    qd: 33, fu: 78,
+    title: "Ben Carlson: the case for being strategically boring",
+    by: "by Ben Carlson (A Wealth of Common Sense)", meta: "May 1, 2026",
+    url: "https://awealthofcommonsense.com",
+    tags: ["Index Investing", "Behavioral Finance", "Ben Carlson", "Wealth Management", "Drawdown"],
+    summary: "Ben Carlson makes the case that the most important skill in investing isn't picking the right assets but surviving the periods when your strategy underperforms — the hidden cost that most factor and active strategies don't account for in their backtests. He cites a 2025 Vanguard study showing investors in target-date funds who made no changes during the 2022 drawdown recovered to new highs 14 months before investors in the same fund who rebalanced out of equities during the correction. Carlson's writing is always approachable; this issue is particularly worth forwarding to clients who chase performance."
+  },
+
+  /* ── TAX & PLANNING ──────────────────────────────────── */
+  {
+    id: "cat-13", type: "Post", category: "Tax & Planning",
+    qd: 33, fu: 100,
+    title: "Michael Kitces on the retirement danger zone",
+    by: "by Michael Kitces (@michaelkitces)", meta: "Mar 22, 2026",
+    url: "https://x.com/michaelkitces/status/2035854079281217580",
+    tags: ["Retirement", "Sequence of Returns", "Kitces", "AresMemo", "Financial Planning"],
+    summary: "Kitces explains the retirement danger zone: the final decade before and first decade of retirement, where portfolio returns dwarf contributions and sequence-of-returns risk is at its absolute peak. A 20% loss at 58 is not the same as a 20% loss at 38 — at 38 you have 25 years of continued contributions to recover; at 58 you have withdrawals compounding the damage. The post includes a clean chart showing the asymmetry of impact by age. Short and quotable — the kind of thing you screenshot and keep."
+  },
+  {
+    id: "cat-14", type: "Article", category: "Tax & Planning",
+    qd: 44, fu: 100,
+    title: "529-to-Roth rollover: the 2026 rule changes most advisors are still missing",
+    by: "by Christine Benz (Morningstar)", meta: "Mar 5, 2026",
+    url: "https://morningstar.com",
+    tags: ["529", "Roth IRA", "SECURE 2.0", "Estate Planning", "Education Savings", "Benz"],
+    summary: "Christine Benz breaks down the three underappreciated constraints in SECURE 2.0's 529-to-Roth rollover provision: the account must have been open for at least 15 years, contributions and earnings from the last 5 years are ineligible, and rollovers count against the annual Roth IRA contribution limit. She argues the rule is most useful for over-funded 529s where the beneficiary won't attend an expensive school, rather than as a primary education savings strategy — a framing that flips how most planners are pitching it."
+  },
+
+  /* ── CURRENT EVENTS ──────────────────────────────────── */
+  {
+    id: "cat-15", type: "Post", category: "Current Events",
+    qd: 11, fu: 67,
+    title: "Charlie Bilello charts the dollar's fall since Liberation Day",
+    by: "by Charlie Bilello (@charliebilello)", meta: "May 2, 2026",
+    url: "https://x.com/charliebilello",
+    tags: ["Dollar", "DXY", "Trade Policy", "Tariffs", "Liberation Day", "Macro"],
+    summary: "Bilello charts the DXY since the April 2 tariff announcement, showing the dollar has fallen nearly 9% against the euro and 7.5% against the yen in six weeks — a historically unusual combination of equity, bond, and dollar weakness happening simultaneously. Notes this is the opposite of the traditional safe-haven pattern that held through 2008, 2018, and 2020, where dollar strength accompanied risk-off moves. If the dollar is no longer the world's crisis hedge, that's a structural shift worth understanding before it's consensus."
+  },
+  {
+    id: "cat-16", type: "Thread", category: "Current Events",
+    qd: 22, fu: 56,
+    title: "Marc Rubinstein revisits why Silicon Valley Bank collapsed in 48 hours",
+    by: "by Marc Rubinstein (@FTAlphaville)", meta: "May 1, 2026",
+    url: "https://x.com/MarcRubinstein",
+    tags: ["SVB", "Bank Run", "Deposit Insurance", "Silicon Valley", "Contagion", "2023 Retrospective"],
+    summary: "Marc Rubinstein's three-year retrospective argues the real SVB story isn't duration risk in the bond portfolio but a social coordination failure that converted a slow-moving solvency problem into an overnight bank run. He traces how a single VC's fund update email — visible to hundreds of GPs in competing funds — triggered the cascade, and asks whether professional group messaging has permanently changed the physics of bank runs. The thread ends with a structural question: the FDIC's deposit insurance cap hasn't changed, but the velocity at which a concentrated depositor base can coordinate withdrawals has increased by orders of magnitude."
+  },
+
+  /* ── CREATIVE & MEDIA ────────────────────────────────── */
+  {
+    id: "cat-17", type: "Video", category: "Creative & Media",
+    qd: 67, fu: 89,
+    title: "Every Frame a Painting: how Goodfellas' Copacabana one-take was made",
+    by: "by Every Frame a Painting (YouTube)", meta: "Jan 12, 2026",
+    url: "https://youtube.com/@everyframeapainting",
+    tags: ["Film", "Cinema", "Scorsese", "Long Take", "Cinematography", "To Watch"],
+    summary: "Every Frame a Painting returns to break down the Copacabana one-take sequence in Goodfellas frame by frame, explaining how Scorsese used blocking and production design to communicate Henry Hill's ascent without a word of dialogue. The episode covers the three months of rehearsal with the Copa's actual staff, how the shot's grammar changed tracking shots in prestige TV for the next 30 years, and why the sequence works as a moral argument — we fall for Henry the same way Henry falls for the life. One of the best video essays on craft made in recent years."
+  },
+  {
+    id: "cat-18", type: "Video", category: "Creative & Media",
+    qd: 89, fu: 100,
+    title: "Patrick (H) Willems on what the Severance Season 3 finale actually meant",
+    by: "by Patrick (H) Willems (YouTube)", meta: "May 4, 2026",
+    url: "https://youtube.com/@patrickhwillems",
+    tags: ["Severance", "Apple TV", "Film Analysis", "Mind-Body Dualism", "To Watch"],
+    summary: "Patrick Willems delivers his signature deep-read on the Severance Season 3 finale, arguing the final twist resolves the mind-body dualism thread planted in the pilot. The essay film traces the Lumon philosophy from the fictional Kier Eagan texts introduced in Season 1 all the way to the literal staging of the finale's last scene — showing the writers built toward a single philosophically coherent conclusion. Best watched after finishing the season; Willems is careful to put a clear spoiler warning before the substantive analysis begins."
+  },
+
+  /* ── LIFE & LEISURE ──────────────────────────────────── */
+  {
+    id: "cat-19", type: "Post", category: "Life & Leisure",
+    qd: 0, fu: 89,
+    title: "Wes Yang on why Tokyo's 7-Eleven beats every grocery store in the US",
+    by: "by Wes Yang (@wesyang)", meta: "Apr 28, 2026",
+    url: "https://x.com/wesyang",
+    tags: ["Japan", "Food", "Travel", "Convenience Stores", "Urbanism", "AresMemo"],
+    summary: "Wes Yang's viral thread cataloging the specific ways Japanese convenience stores — hot foods, onigiri variety, dessert quality, egg sandwiches — embarrass their American counterparts, framed through photos taken over a two-week Tokyo trip. The thread ends with a semi-serious case for the konbini as a model for urban food infrastructure that American city planners have largely ignored, touching on zoning, density, and what 'convenient' actually means when walkability is assumed. Funny and genuinely illuminating at the same time."
+  },
+  {
+    id: "cat-20", type: "Recipe", category: "Life & Leisure",
+    qd: 0, fu: 33,
+    title: "Kenji López-Alt's 15-minute Japanese egg salad sandwich (tamago sando)",
+    by: "by Kenji López-Alt (Serious Eats)", meta: "Mar 10, 2026",
+    url: "https://seriouseats.com",
+    tags: ["Recipe", "Japanese Food", "Sandwich", "Eggs", "Cooking", "Kewpie"],
+    summary: "Kenji's recipe for the convenience-store tamago sando achieves the signature fluffy-dense contrast through two techniques: boiling eggs in a precise rolling boil for exactly 9 minutes and folding the chopped yolks into Japanese Kewpie mayo before adding the whites. The shokupan (milk bread) is the structural key — any square pullman loaf with a tight crumb works as a substitute. Kenji estimates the sandwich costs $1.80 per serving if you already have Kewpie and shokupan in rotation. The kind of recipe you actually make rather than bookmark and forget."
+  },
+
+  /* ── SCIENCE & WORLD ─────────────────────────────────── */
+  {
+    id: "cat-21", type: "Article", category: "Science & World",
+    qd: 22, fu: 11,
+    title: "Ten squats every 45 minutes outperforms a 30-minute walk for blood sugar control",
+    by: "by Zib Atkins (@ayuswellness)", meta: "Apr 6, 2026",
+    url: "https://x.com/ayuswellness/status/2041079912438587749",
+    tags: ["Wellness", "Exercise", "Blood Sugar", "Sedentary Work", "Health Science"],
+    summary: "Zib Atkins cites a University of Texas study showing that 10 squats every hour controls blood sugar better than a full 30-minute walk, with the added benefit of boosting circulation during sedentary workdays. The mechanism is glucose transporter activation in muscle cells — brief, repeated contractions keep the glucose uptake pathway open in a way a single longer bout doesn't sustain across the day. Practical takeaway: set a 45-minute timer. You don't need a gym."
+  },
+  {
+    id: "cat-22", type: "Article", category: "Science & World",
+    qd: 44, fu: 44,
+    title: "CRISPR base editing is now being used to remove genetic disease risk before birth",
+    by: "by Antonio Regalado (MIT Technology Review)", meta: "Apr 10, 2026",
+    url: "https://technologyreview.com",
+    tags: ["CRISPR", "Gene Editing", "Base Editing", "Genetics", "Ethics", "Preimplantation"],
+    summary: "Antonio Regalado profiles the emerging application of CRISPR base editing — which changes a single DNA letter without cutting the double helix — to preimplantation embryos. Four clinics outside the US are now using the technique to remove variants associated with Huntington's and BRCA1/2. The piece carefully distinguishes base editing from He Jiankui's 2018 germline CRISPR work (the accuracy profile is fundamentally different), and surfaces the ethical divide between therapeutic correction of severe disease variants and the question of where that line sits. Essential context for anyone following the biotech regulatory landscape."
+  },
+  {
+    id: "cat-23", type: "Post", category: "Science & World",
+    qd: 11, fu: 100,
+    title: "New bioluminescent jellyfish found 2,300 meters beneath the Coral Sea",
+    by: "by Schmidt Ocean Institute", meta: "Apr 14, 2026",
+    url: "https://schmidtocean.org",
+    tags: ["Marine Biology", "Deep Sea", "Bioluminescence", "New Species", "Ocean", "Nature"],
+    summary: "Marine biologists working from the Schmidt Ocean Institute's Falkor vessel identified a new rhizostome jellyfish species at 2,300 meters depth in the Coral Sea, notable for emitting a steady blue-green bioluminescent pulse rather than the brief flash typical of deep-sea cnidarians. The mechanism — a continuous biochemical loop rather than a single-oxidation event — could inform low-power sensor design in underwater robotics. The species was cataloged entirely from ROV footage before physical collection. The video of the pulse is hypnotic."
+  },
+
+  /* ── LEADERSHIP ──────────────────────────────────────── */
+  {
+    id: "cat-24", type: "Essay", category: "Leadership",
+    qd: 78, fu: 78,
+    title: "Shane Parrish on Bezos's Type 1 / Type 2 decision framework — and where it breaks",
+    by: "by Shane Parrish (Farnam Street)", meta: "Mar 8, 2026",
+    url: "https://fs.blog",
+    tags: ["Decision Making", "Bezos", "Type 1/Type 2", "Mental Models", "Leadership", "Reversibility"],
+    summary: "Shane Parrish revisits Bezos's 1997 shareholder letter distinction between Type 1 (one-way door) and Type 2 (two-way door) decisions, arguing that the failure mode in most organizations is treating Type 2 decisions as Type 1. The essay maps this onto modern product teams and introduces a decision log practice — recording which type a decision was classified as at the time — to combat hindsight bias in retrospectives. The most useful part is the section on how urgency pressure causes Type 2 decisions to masquerade as Type 1, and the specific meeting structures that prevent that drift."
+  },
+  {
+    id: "cat-25", type: "Podcast", category: "Leadership",
+    qd: 89, fu: 67,
+    title: "Patrick Collison on the structure of ambitious organizations",
+    by: "by Dwarkesh Patel (The Dwarkesh Podcast)", meta: "Mar 30, 2026",
+    url: "https://dwarkeshpatel.com",
+    tags: ["Patrick Collison", "Stripe", "Organizational Design", "Talent", "Ambition", "Management"],
+    summary: "Patrick Collison sits down with Dwarkesh Patel for a three-hour conversation ranging from Stripe's internal capital allocation process to why Collison believes most organizations have a talent identification problem rather than a talent shortage problem. Key claim: ambitious organizations succeed not by hiring the smartest people but by creating conditions where smart people can identify and pursue the most important problems rather than the most legible ones. The section on how Stripe evaluates whether a problem is 'worth the organizational cost' of pursuing it is dense and worth replaying."
+  },
+
+  /* ── CULTURE ─────────────────────────────────────────── */
+  {
+    id: "cat-26", type: "Post", category: "Culture",
+    qd: 11, fu: 67,
+    title: "Ryan Holiday on the one Stoic practice that actually holds at 6 AM",
+    by: "by Ryan Holiday (@RyanHoliday)", meta: "Apr 25, 2026",
+    url: "https://x.com/RyanHoliday",
+    tags: ["Stoicism", "Morning Routine", "Premeditatio Malorum", "Habit", "Mental Models"],
+    summary: "Holiday argues that the premeditatio malorum practice — imagining everything that could go wrong with the day before it starts — is more effective in the first 10 minutes of waking than any positive visualization exercise, because it primes the prefrontal cortex to treat setbacks as expected rather than threatening. He cites NYU researcher Gabriele Oettingen's work on why positive visualization alone actually decreases follow-through. Short post, but the Oettingen research link at the bottom is worth following — her 'mental contrasting' framework is the academic version of what Holiday is describing."
+  },
+
+  /* ── CURIOSITIES ─────────────────────────────────────── */
+  {
+    id: "cat-27", type: "Post", category: "Curiosities",
+    qd: 11, fu: 100,
+    title: "The font that can't be copyrighted and the lawsuit that ended with a dictionary definition",
+    by: "by Kottke.org", meta: "Apr 8, 2026",
+    url: "https://kottke.org",
+    tags: ["Typography", "Copyright Law", "Fonts", "Helvetica", "Intellectual Property"],
+    summary: "Jason Kottke resurfaces the strange legal history of the Helvetica typeface — its core design elements were held non-copyrightable in 1988 because fonts were classified as industrial designs rather than artistic works, a ruling that led to dozens of Helvetica clones that are legally identical in structure but sell for a fraction of the license price. The post links to a law review article tracing how the Copyright Office's definition of 'useful article' applies to letterforms, and ends with the delightful fact that the word 'font' was added to the Oxford English Dictionary in the same year the ruling was handed down."
+  },
+  {
+    id: "cat-28", type: "Post", category: "Curiosities",
+    qd: 0, fu: 100,
+    title: "The man who convinced KGB interrogators he was a time traveler from 2026",
+    by: "by Atlas Obscura", meta: "Mar 22, 2026",
+    url: "https://atlasobscura.com",
+    tags: ["History", "Espionage", "Cold War", "KGB", "Curiosities", "1988"],
+    summary: "Atlas Obscura profiles a 1988 KGB file that surfaced in 2023 describing an American student who was detained in Moscow and, facing interrogation, claimed to be a time traveler from 2026 who had arrived accidentally. The file records the interrogators noting that several of his factual claims about events between 1988 and 2026 — which they checked against sealed predictions written by Soviet scientists — had a 71% accuracy rate, causing a brief internal panic before the case was classified. The student's identity remains unknown. Whether it's true or an elaborate KGB joke, it's extraordinary either way."
+  },
+
+  /* ── HISTORY ─────────────────────────────────────────── */
+  {
+    id: "cat-29", type: "Article", category: "History",
+    qd: 56, fu: 44,
+    title: "How the Ottoman land reform of 1858 created modern Middle East instability",
+    by: "by Avi Shlaim (London Review of Books)", meta: "Jan 30, 2026",
+    url: "https://lrb.co.uk",
+    tags: ["Ottoman Empire", "Middle East", "Land Reform", "History", "Colonialism", "Palestine"],
+    summary: "Historian Avi Shlaim traces a direct line from the Ottoman Land Code of 1858 — which converted communal tribal land tenure into individually titled private property — to the conditions that enabled European colonial powers to purchase large swaths of what became Mandatory Palestine, Syria, and Iraq from newly titled landowners who were often urban absentees rather than the cultivators who had worked the land for generations. Shlaim argues this single administrative act, intended to modernize Ottoman tax collection, is more causally important to understanding 20th-century Middle East conflict than the Sykes-Picot Agreement. Challenging and rewarding."
+  },
+  {
+    id: "cat-30", type: "Longform", category: "History",
+    qd: 67, fu: 56,
+    title: "Adam Tooze on the 18 months that built the modern financial system",
+    by: "by Adam Tooze (Substack)", meta: "Feb 6, 2026",
+    url: "https://adamtooze.substack.com",
+    tags: ["Bretton Woods", "Keynes", "Harry Dexter White", "IMF", "Global Finance", "1944"],
+    summary: "Adam Tooze profiles the 1944 Bretton Woods conference as a 22-day negotiation between Keynes, representing a near-bankrupt Britain, and Harry Dexter White, representing a creditor America, whose competing blueprints were collapsed into a hybrid that neither man wanted. Tooze argues the modern IMF and World Bank are best understood as White's structural vision with Keynesian vocabulary grafted on top — and that the instability visible in global currency markets today traces directly to that foundational compromise. The essay rewards slow reading; Tooze is operating at his best here."
+  },
+
 ];
 
 const PLANE_CATEGORIES = {
