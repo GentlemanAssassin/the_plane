@@ -1,0 +1,30 @@
+{
+  "name": "thePlane",
+  "short_name": "thePlane",
+  "description": "2D content curation on a scoring plane",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070a13",
+  "theme_color": "#070a13",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/Logo_Dark.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/Logo_Dark.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/ICO_Dark.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ]
+}
