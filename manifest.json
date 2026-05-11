@@ -10,13 +10,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "assets/Logo_Dark.png",
+      "src": "assets/Logo_Dark_Full.png",
       "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/Logo_Dark.png",
+      "src": "assets/Logo_Dark_Full.png",
       "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "maskable"
