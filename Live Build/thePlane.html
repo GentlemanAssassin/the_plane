@@ -1,0 +1,2769 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>thePlane</title>
+
+<!-- ── Favicon ── -->
+<link rel="icon" type="image/x-icon" href="assets/ICO_Dark.ico">
+<link rel="icon" type="image/png" sizes="1254x1254" href="assets/Logo_Dark_Full.png">
+
+<!-- ── iOS home screen ── -->
+<link rel="apple-touch-icon" href="assets/Logo_Dark_Full.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="thePlane">
+
+<!-- ── PWA / Android home screen ── -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#070a13">
+
+<script>
+  // Apply theme before paint to avoid flash.
+  try {
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('plane-theme') || 'dark');
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ============ Theme tokens ============ */
+  :root[data-theme="dark"] {
+    --page-bg: #070a13;
+    --page-bg-grad-a: oklch(30% 0.08 240 / 0.45);
+    --page-bg-grad-b: oklch(22% 0.06 255 / 0.35);
+
+    --fg:        #eaf0fa;
+    --fg-muted:  rgba(234,240,250,0.58);
+    --fg-faint:  rgba(234,240,250,0.34);
+
+    --surface-1: #0e1320;
+    --surface-2: #131a2a;
+    --surface-stroke: rgba(140,180,255,0.10);
+
+    --card-grad-a: #141b2c;
+    --card-grad-b: #0d1320;
+    --card-back-bg: #1a2236;
+    --card-shadow: 0 6px 18px rgba(0,4,20,0.55);
+
+    --plane-panel-a: oklch(26% 0.05 220);
+    --plane-panel-b: oklch(18% 0.04 230);
+    --plane-fg-mute:  oklch(94% 0.06 200 / 0.62);
+    --plane-fg-faint: oklch(94% 0.06 200 / 0.28);
+    --plane-chrome:   oklch(94% 0.06 200 / 0.55);
+    --plane-knob-grad: radial-gradient(circle at 35% 28%, oklch(92% 0.14 205) 0%, oklch(70% 0.22 220) 70%);
+    --plane-knob-ring: oklch(90% 0.14 205 / 0.35);
+    --plane-knob-border: oklch(30% 0.08 230);
+    --plane-knob-center: oklch(22% 0.05 220 / 0.45);
+    --plane-radial: radial-gradient(circle, oklch(84% 0.14 205 / 0.22) 0%, oklch(84% 0.14 205 / 0) 55%);
+    --plane-dot-base: oklch(94% 0.06 200 / 0.28);
+    --plane-dot-high: oklch(84% 0.18 205);
+    --plane-panel-shadow:
+      inset 0 2px 6px oklch(0% 0 0 / 0.55),
+      inset 0 1px 0 oklch(0% 0 0 / 0.45),
+      inset 0 -1px 0 oklch(84% 0.14 205 / 0.08),
+      0 0 24px oklch(70% 0.18 220 / 0.06),
+      0 1px 0 oklch(100% 0 0 / 0.04);
+  }
+
+  :root[data-theme="light"] {
+    --page-bg: #e9edf4;
+    --page-bg-grad-a: oklch(94% 0.02 230 / 0.6);
+    --page-bg-grad-b: oklch(90% 0.03 215 / 0.5);
+
+    --fg:        #0b1428;
+    --fg-muted:  rgba(11,20,40,0.62);
+    --fg-faint:  rgba(11,20,40,0.38);
+
+    --surface-1: #f3f5fa;
+    --surface-2: #ffffff;
+    --surface-stroke: rgba(11,20,40,0.10);
+
+    --card-grad-a: #ffffff;
+    --card-grad-b: #edf1f8;
+    --card-back-bg: #d8dfeb;
+    --card-shadow: 0 2px 10px rgba(10,30,80,0.08);
+
+    --plane-panel-a: oklch(92% 0.04 210);
+    --plane-panel-b: oklch(86% 0.05 215);
+    --plane-fg-mute:  oklch(34% 0.08 230 / 0.62);
+    --plane-fg-faint: oklch(34% 0.08 230 / 0.28);
+    --plane-chrome:   oklch(34% 0.08 230 / 0.5);
+    --plane-knob-grad: radial-gradient(circle at 35% 28%, oklch(52% 0.22 280) 0%, oklch(34% 0.20 270) 70%);
+    --plane-knob-ring: oklch(100% 0 0 / 0.5);
+    --plane-knob-border: oklch(20% 0.12 265);
+    --plane-knob-center: oklch(100% 0 0 / 0.3);
+    --plane-radial: radial-gradient(circle, oklch(40% 0.18 270 / 0.12) 0%, oklch(40% 0.18 270 / 0) 55%);
+    --plane-dot-base: oklch(34% 0.08 230 / 0.28);
+    --plane-dot-high: oklch(50% 0.22 280);
+    --plane-panel-shadow:
+      inset 0 2px 5px oklch(34% 0.08 230 / 0.30),
+      inset 0 1px 0 oklch(34% 0.08 230 / 0.22),
+      inset 0 -1px 0 oklch(100% 0 0 / 0.75),
+      0 1px 0 oklch(100% 0 0 / 0.55);
+  }
+
+  /* ============ Responsive size variables ============ */
+  /* 2026-05-06 R2: Mike's screenshot showed titles still clipping at the
+     "iPhone web app" breakpoint. The fix is two-fold:
+       1. Card heights bumped at every breakpoint so 2-line titles + meta +
+          byline fit with breathing room.
+       2. Plane shrunk meaningfully so the new card height has somewhere to
+          come from (mobile real estate budget is fixed).
+       Title font keeps its size more aggressively (down to 13px not 11.5)
+       so the cards stay readable on small screens. */
+  :root {
+    --card-height:    104px;
+    --card-title-fs:  14.5px;
+    --card-meta-fs:   10px;
+    --card-by-fs:     11px;
+    --plane-size:    258px;
+    --radial-size:   212px;
+    --app-pad-top:    8px;
+    --app-pad-bot:    8px;
+    --stack-gap:      14px;
+  }
+  @media (max-height: 820px) {
+    :root {
+      --card-height:    98px;
+      --card-title-fs:  14px;
+      --plane-size:    218px;
+      --radial-size:   180px;
+      --app-pad-top:    6px;
+      --app-pad-bot:    6px;
+      --stack-gap:      12px;
+    }
+  }
+  @media (max-height: 720px) {
+    :root {
+      --card-height:    90px;
+      --card-title-fs:  13.5px;
+      --card-meta-fs:    9.5px;
+      --card-by-fs:     10.5px;
+      --plane-size:    183px;
+      --radial-size:   150px;
+      --app-pad-top:    4px;
+      --app-pad-bot:    4px;
+      --stack-gap:       9px;
+    }
+  }
+  @media (max-height: 640px) {
+    :root {
+      --card-height:    84px;
+      --card-title-fs:  12.5px;
+      --card-meta-fs:    9px;
+      --card-by-fs:     10px;
+      --plane-size:    148px;
+      --radial-size:   122px;
+      --app-pad-top:    2px;
+      --app-pad-bot:    2px;
+      --stack-gap:       7px;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  * { -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  html, body {
+    background: var(--page-bg);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: var(--fg);
+    min-height: 100vh;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    transition: background 240ms ease, color 240ms ease;
+  }
+  body {
+    background:
+      radial-gradient(900px 500px at 15% 0%, var(--page-bg-grad-a), transparent 60%),
+      radial-gradient(800px 450px at 85% 100%, var(--page-bg-grad-b), transparent 60%),
+      var(--page-bg);
+  }
+
+  /* ============ Layout ============ */
+  #app {
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--app-pad-top) + env(safe-area-inset-top, 0px)) 18px calc(var(--app-pad-bot) + env(safe-area-inset-bottom, 0px));
+    gap: var(--stack-gap);
+  }
+
+  body[data-view="plane"]    .view-settings { display: none; }
+  body[data-view="settings"] .view-plane    { display: none; }
+  .view-plane, .view-settings {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .view-settings { gap: 16px; }
+  .view-plane    { gap: 0; }
+  .view-plane .app-header { margin-bottom: 10px; }
+
+  .app-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--fg);
+  }
+  .title .the {
+    font-style: italic;
+    color: var(--fg-muted);
+  }
+  .axes-label {
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+  .header-actions { display: flex; gap: 6px; align-items: center; }
+  .icon-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    color: var(--fg-muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: color 180ms;
+  }
+  .icon-btn:hover { color: var(--fg); }
+  .pill-btn {
+    appearance: none;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    cursor: pointer;
+  }
+  .pill-btn[aria-pressed="true"] {
+    color: var(--fg);
+    background: var(--surface-2);
+  }
+
+  /* ============ Result stack ============ */
+  .result-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+  @media (max-height: 720px) { .result-stack { gap: 6px; } }
+  @media (max-height: 640px) { .result-stack { gap: 5px; } }
+  .slot {
+    position: relative;
+    height: var(--card-height);
+    overflow: visible;
+  }
+  .card-wrap {
+    position: absolute;
+    inset: 0;
+  }
+  .card {
+    background: linear-gradient(180deg, var(--card-grad-a) 0%, var(--card-grad-b) 100%);
+    border: 1px solid var(--surface-stroke);
+    border-radius: 12px;
+    padding: 8px 12px 9px;
+    box-shadow: var(--card-shadow);
+    width: 100%;
+    height: var(--card-height);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    cursor: pointer;
+    transition: background 240ms ease, border-color 240ms ease;
+  }
+  .card:focus-visible { outline: 2px solid var(--plane-dot-high); outline-offset: 2px; }
+  .card-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; min-width: 0; flex-shrink: 0; }
+  .cat-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .card-meta-text {
+    color: var(--fg-faint);
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: var(--card-meta-fs);
+    font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    min-width: 0; flex: 1 1 auto;
+  }
+  .card-title {
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: var(--card-title-fs); line-height: 1.22;
+    color: var(--fg);
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .card-byline {
+    margin-top: 3px;
+    color: var(--fg-muted);
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: var(--card-by-fs);
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+  .card-by { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .card-dist { font-variant-numeric: tabular-nums; opacity: 0.5; flex-shrink: 0; }
+
+  /* ============ Plane ============ */
+  .plane-panel {
+    position: relative;
+    padding: 14px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, var(--plane-panel-a), var(--plane-panel-b));
+    box-shadow: var(--plane-panel-shadow);
+    /* margin: auto centers horizontally (like align-self:center) and distributes
+       remaining vertical space equally above and below the panel. */
+    margin: auto;
+  }
+  .plane-corner-tick { position: absolute; width: 8px; height: 8px; }
+  .plane-corner-tick.tl { top: 4px; left: 4px;
+    border-top: 1px solid var(--plane-chrome); border-left: 1px solid var(--plane-chrome); }
+  .plane-corner-tick.tr { top: 4px; right: 4px;
+    border-top: 1px solid var(--plane-chrome); border-right: 1px solid var(--plane-chrome); }
+  .plane-corner-tick.bl { bottom: 4px; left: 4px;
+    border-bottom: 1px solid var(--plane-chrome); border-left: 1px solid var(--plane-chrome); }
+  .plane-corner-tick.br { bottom: 4px; right: 4px;
+    border-bottom: 1px solid var(--plane-chrome); border-right: 1px solid var(--plane-chrome); }
+  .plane-label {
+    position: absolute;
+    top: -10px; left: 50%; transform: translateX(-50%);
+    padding: 2px 8px;
+    background: var(--surface-1);
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.22em;
+    color: var(--plane-chrome);
+    text-transform: uppercase;
+    border: 1px solid var(--surface-stroke);
+  }
+  .plane-stage {
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    user-select: none;
+  }
+  /* Axis labels: bumped per ThePlane Dev notes 2026-05-06 to read clearly. */
+  .axis-label {
+    color: var(--plane-fg-mute);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 7px;
+    font-weight: 600;
+  }
+  .axis-label.vert { writing-mode: vertical-rl; }
+  .axis-label.vert.left { transform: rotate(180deg); }
+  .plane-row { display: flex; align-items: center; gap: 14px; }
+  .plane-surface {
+    position: relative;
+    width: var(--plane-size); height: var(--plane-size);
+    background: linear-gradient(180deg, oklch(100% 0 0 / 0.08), oklch(0% 0 0 / 0.08));
+    border: 1px solid var(--plane-fg-faint);
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    box-shadow: inset 0 2px 8px oklch(0% 0 0 / 0.15), inset 0 -1px 0 oklch(100% 0 0 / 0.15);
+  }
+  .plane-surface.dragging { cursor: grabbing; }
+  .grid-h, .grid-v { position: absolute; background: var(--plane-fg-faint); }
+  .grid-h { left: 0; right: 0; height: 1px; }
+  .grid-v { top: 0; bottom: 0; width: 1px; }
+  .grid-cross-h, .grid-cross-v { position: absolute; background: var(--plane-fg-mute); }
+  .grid-cross-h { left: 0; right: 0; top: 50%; height: 1px; }
+  .grid-cross-v { top: 0; bottom: 0; left: 50%; width: 1px; }
+  .scatter-dot {
+    position: absolute;
+    width: 6px; height: 6px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--plane-dot-base);
+    pointer-events: none;
+    transition: all 220ms cubic-bezier(.22,1,.36,1);
+  }
+  .scatter-dot.high {
+    width: 10px; height: 10px;
+    background: var(--plane-dot-high);
+    box-shadow: 0 0 10px var(--plane-dot-high);
+  }
+  .knob-radial {
+    position: absolute;
+    width: var(--radial-size); height: var(--radial-size);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--plane-radial);
+    pointer-events: none;
+  }
+  .knob {
+    position: absolute;
+    width: 30px; height: 30px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--plane-knob-grad);
+    border: 1px solid var(--plane-knob-border);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.35), inset 0 -2px 3px rgba(0,0,0,0.18);
+    pointer-events: none;
+    transition: box-shadow 180ms;
+  }
+  .knob.dragging {
+    box-shadow:
+      0 5px 20px rgba(0,0,0,0.4),
+      0 0 0 6px var(--plane-knob-ring),
+      inset 0 -2px 3px rgba(0,0,0,0.18);
+  }
+  .knob::after {
+    content: '';
+    position: absolute;
+    inset: 9px;
+    border-radius: 50%;
+    background: var(--plane-knob-center);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.2);
+  }
+  .plane-surface:not(.dragging) .knob,
+  .plane-surface:not(.dragging) .knob-radial {
+    transition: left 260ms cubic-bezier(.22,1,.36,1), top 260ms cubic-bezier(.22,1,.36,1), box-shadow 180ms;
+  }
+
+  /* ============ Sideswap keyframes ============ */
+  @keyframes planeSwapOutR {
+    from { transform: translateX(0); opacity: 1; }
+    to   { transform: translateX(110%); opacity: 0; }
+  }
+  @keyframes planeSwapOutL {
+    from { transform: translateX(0); opacity: 1; }
+    to   { transform: translateX(-110%); opacity: 0; }
+  }
+  @keyframes planeSwapInR {
+    from { transform: translateX(-110%); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes planeSwapInL {
+    from { transform: translateX(110%); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+
+  /* ============ Flipboard (double-flip with blank backside) ============ */
+  .slot.flip-slot { perspective: 1400px; }
+  .flip-container {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    /* transition is set inline per-flip so duration tracks state.speed */
+    transform: rotateX(0deg);
+  }
+  .flip-face {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .flip-back { transform: rotateX(180deg); }
+  /* Blank back card — solid color, no content, just the card chrome shape. */
+  .card.flip-blank-back {
+    background: var(--card-back-bg);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--surface-stroke);
+  }
+
+  /* ============ Hide / restore ============ */
+  body[data-plane-hidden="1"] .plane-panel { display: none; }
+  body[data-plane-hidden="1"] .plane-restore { display: flex; }
+  body[data-view="settings"] .plane-restore { display: none !important; }
+  .plane-restore {
+    display: none;
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--surface-1);
+    border: 1px dashed var(--surface-stroke);
+    border-radius: 14px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    color: var(--fg);
+    font: inherit;
+  }
+  .restore-text { text-align: left; min-width: 0; }
+  .restore-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    line-height: 1.1;
+  }
+  .restore-sub {
+    margin-top: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+
+  /* ============ Settings page ============ */
+  .settings-body {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    padding: 4px 0 24px;
+  }
+  .section { display: flex; flex-direction: column; gap: 12px; }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .field-label {
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+  .field-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--fg-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .segmented {
+    position: relative;
+    display: flex;
+    padding: 3px;
+    border-radius: 10px;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    user-select: none;
+  }
+  .segmented button {
+    flex: 1;
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    cursor: pointer;
+    padding: 8px 10px;
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 7px;
+    position: relative;
+    z-index: 1;
+    transition: color 180ms;
+  }
+  .segmented button[aria-pressed="true"] { color: var(--fg); }
+  .segmented .seg-thumb {
+    position: absolute;
+    top: 3px; bottom: 3px;
+    border-radius: 7px;
+    background: var(--surface-2);
+    border: 1px solid var(--surface-stroke);
+    transition: left 180ms cubic-bezier(.3,.7,.4,1), width 180ms;
+  }
+  .slider {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--surface-1);
+    outline: none;
+    border: 1px solid var(--surface-stroke);
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--plane-dot-high);
+    border: 1px solid var(--plane-knob-border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+  .slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--plane-dot-high);
+    border: 1px solid var(--plane-knob-border);
+    cursor: pointer;
+  }
+  .hex-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    margin-left: 4px;
+  }
+  /* ============ Palette grid (curated 10 presets) ============ */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .palette-tile {
+    appearance: none;
+    border: 1px solid var(--surface-stroke);
+    border-radius: 10px;
+    padding: 0;
+    cursor: pointer;
+    background: var(--tile-primary, var(--surface-1));
+    height: 44px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 180ms, transform 120ms ease, box-shadow 180ms;
+  }
+  .palette-tile:active { transform: scale(0.96); }
+  .palette-tile .tile-secondary {
+    position: absolute;
+    right: 6px; top: 6px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--tile-secondary, transparent);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.18);
+  }
+  .palette-tile .tile-name {
+    position: absolute;
+    left: 6px; bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tile-secondary, var(--fg));
+    opacity: 0.92;
+  }
+  .palette-tile[aria-pressed="true"] {
+    border-color: var(--tile-secondary, var(--fg));
+    box-shadow: 0 0 0 2px var(--tile-secondary, var(--fg));
+  }
+  .palette-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 11.5px;
+    color: var(--fg-muted);
+    align-items: center;
+  }
+  .palette-legend .legend-swatch {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: -1px;
+    border: 1px solid var(--surface-stroke);
+  }
+  .reset-btn {
+    align-self: flex-start;
+    padding: 8px 14px;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    border-radius: 8px;
+    color: var(--fg-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .reset-btn:hover { color: var(--fg); }
+  .preview-line {
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 11.5px;
+    color: var(--fg-faint);
+    line-height: 1.5;
+  }
+
+  /* ============ Hide button on plane panel ============ */
+  .plane-hide-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    color: var(--plane-fg-mute);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 180ms, background 180ms;
+  }
+  .plane-hide-btn:hover { color: var(--fg); background: var(--surface-2); }
+  .plane-hide-btn:focus-visible { outline: 2px solid var(--plane-dot-high); outline-offset: 2px; }
+
+  /* ============ Card detail view ============ */
+  body[data-view="plane"]    .view-card { display: none; }
+  body[data-view="settings"] .view-card { display: none; }
+  body[data-view="card"]     .view-plane    { display: none; }
+  body[data-view="card"]     .view-settings { display: none; }
+  .view-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+  }
+  .expanded-card {
+    background: linear-gradient(180deg, var(--card-grad-a) 0%, var(--card-grad-b) 100%);
+    border: 1px solid var(--surface-stroke);
+    border-radius: 16px;
+    padding: 18px 20px 22px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .expanded-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    margin: 0;
+  }
+  .expanded-by {
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 12.5px;
+    color: var(--fg-muted);
+  }
+  .expanded-summary {
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 13px;
+    color: var(--fg);
+    line-height: 1.55;
+    opacity: 0.88;
+  }
+  .expanded-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .tag-chip {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    color: var(--fg-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+  .expanded-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .open-link {
+    appearance: none;
+    background: var(--plane-dot-high);
+    border: 1px solid var(--plane-knob-border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--surface-1);
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .open-link:hover { filter: brightness(1.05); }
+  /* ============ Archive button (in expanded card actions) ============ */
+  .archive-btn {
+    appearance: none;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .archive-btn:hover { color: var(--fg); }
+
+  /* ============ Card edit gear (absolute in expanded-card) ============ */
+  .expanded-card { position: relative; }
+  .card-edit-btn {
+    position: absolute;
+    top: 14px; right: 16px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    color: var(--fg-muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: color 180ms, background 180ms;
+    z-index: 2;
+  }
+  .card-edit-btn:hover { color: var(--fg); background: var(--surface-2); }
+
+  /* ============ Edit Position view ============ */
+  body[data-view="plane"]    .view-edit { display: none; }
+  body[data-view="card"]     .view-edit { display: none; }
+  body[data-view="settings"] .view-edit { display: none; }
+  body[data-view="edit"]     .view-plane    { display: none; }
+  body[data-view="edit"]     .view-card     { display: none; }
+  body[data-view="edit"]     .view-settings { display: none; }
+  .view-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+  }
+  .edit-item-preview {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 14px;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    border-radius: 12px;
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg);
+    line-height: 1.3;
+  }
+  .edit-orig-dot {
+    position: absolute;
+    width: 10px; height: 10px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--plane-dot-high);
+    opacity: 0.35;
+    pointer-events: none;
+    box-shadow: 0 0 0 3px var(--plane-dot-high);
+    outline: none;
+  }
+  .edit-coords {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .save-position-btn {
+    width: 100%;
+    padding: 13px 16px;
+    background: var(--plane-dot-high);
+    border: 1px solid var(--plane-knob-border);
+    border-radius: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--surface-1);
+    cursor: pointer;
+    transition: filter 150ms;
+  }
+  .save-position-btn:hover { filter: brightness(1.08); }
+
+  /* ============ Archive section in Settings ============ */
+  .archived-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--surface-1);
+    border: 1px solid var(--surface-stroke);
+    border-radius: 10px;
+  }
+  .archived-item-title {
+    font-family: 'IBM Plex Sans', system-ui;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--fg);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .restore-item-btn {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--surface-stroke);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .restore-item-btn:hover { color: var(--fg); }
+
+</style>
+</head>
+<body data-view="plane">
+<div id="app">
+
+  <!-- ─────── Plane view ─────── -->
+  <div class="view-plane">
+    <header class="app-header">
+      <div>
+        <div class="title"><span class="the">the</span>Plane</div>
+        <div class="axes-label" id="axesLabel">beta</div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme"></button>
+        <button class="pill-btn" id="scatterBtn" aria-pressed="false">Scatter</button>
+        <button class="icon-btn" id="settingsBtn" aria-label="Open settings" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="result-stack" id="resultStack"></main>
+
+    <button class="plane-restore" id="planeRestore" type="button">
+      <span class="restore-text">
+        <span class="restore-title">Plane is hidden</span>
+        <span class="restore-sub">Tap to restore</span>
+      </span>
+      <span class="pill-btn" style="pointer-events:none">Show</span>
+    </button>
+
+    <section class="plane-panel" id="planePanel">
+      <div class="plane-label">Plane &middot; 2D</div>
+      <div class="plane-corner-tick tl"></div>
+      <div class="plane-corner-tick bl"></div>
+      <div class="plane-corner-tick br"></div>
+      <button class="plane-hide-btn" id="hidePlaneBtn" aria-label="Hide plane" title="Hide plane">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </button>
+
+      <div class="plane-stage">
+        <div class="axis-label" id="axisTop"></div>
+        <div class="plane-row">
+          <div class="axis-label vert left" id="axisLeft"></div>
+          <div class="plane-surface" id="planeSurface">
+            <div class="grid-cross-h"></div>
+            <div class="grid-cross-v"></div>
+            <div class="knob-radial" id="knobRadial"></div>
+            <div class="knob" id="knob"></div>
+          </div>
+          <div class="axis-label vert" id="axisRight"></div>
+        </div>
+        <div class="axis-label" id="axisBottom"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ─────── Card detail view ─────── -->
+  <div class="view-card">
+    <header class="app-header">
+      <div style="min-width: 0; flex: 1;">
+        <div class="title"><span class="the">the</span> Card</div>
+        <div class="axes-label" id="cardMetaLine"></div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeBtn3" aria-label="Toggle theme" title="Toggle theme"></button>
+        <button class="pill-btn" id="cardBackBtn">Back</button>
+      </div>
+    </header>
+    <article class="expanded-card" id="expandedCard"></article>
+  </div>
+
+  <!-- ─────── Edit Position view ─────── -->
+  <div class="view-edit">
+    <header class="app-header">
+      <div style="min-width: 0; flex: 1;">
+        <div class="title"><span class="the">the</span> Position</div>
+        <div class="axes-label" id="editMetaLine"></div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeBtn4" aria-label="Toggle theme" title="Toggle theme"></button>
+        <button class="pill-btn" id="editCancelBtn">Cancel</button>
+      </div>
+    </header>
+    <div class="edit-item-preview" id="editItemPreview"></div>
+    <section class="plane-panel" id="editPlanePanel">
+      <div class="plane-label">Drag to set position</div>
+      <div class="plane-corner-tick tl"></div>
+      <div class="plane-corner-tick tr"></div>
+      <div class="plane-corner-tick bl"></div>
+      <div class="plane-corner-tick br"></div>
+      <div class="plane-stage">
+        <div class="axis-label" id="editAxisTop"></div>
+        <div class="plane-row">
+          <div class="axis-label vert left" id="editAxisLeft"></div>
+          <div class="plane-surface" id="editPlaneSurface">
+            <div class="grid-cross-h"></div>
+            <div class="grid-cross-v"></div>
+            <div class="edit-orig-dot" id="editOrigDot"></div>
+            <div class="knob-radial" id="editKnobRadial"></div>
+            <div class="knob" id="editKnob"></div>
+          </div>
+          <div class="axis-label vert" id="editAxisRight"></div>
+        </div>
+        <div class="axis-label" id="editAxisBottom"></div>
+      </div>
+    </section>
+    <div class="edit-coords" id="editCoords"></div>
+    <button class="save-position-btn" id="editSaveBtn" type="button">Save Position</button>
+  </div>
+
+  <!-- ─────── Settings view ─────── -->
+  <div class="view-settings">
+    <header class="app-header">
+      <div>
+        <div class="title"><span class="the">the</span> Settings</div>
+        <div class="axes-label">Animation · Color · Reset</div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeBtn2" aria-label="Toggle theme" title="Toggle theme"></button>
+        <button class="pill-btn" id="backBtn">Back</button>
+      </div>
+    </header>
+
+    <div class="settings-body">
+
+      <section class="section">
+        <div class="section-label">Animation</div>
+        <div class="field">
+          <div class="field-row">
+            <span class="field-label">Type</span>
+          </div>
+          <div class="segmented" id="animationSeg" role="radiogroup">
+            <span class="seg-thumb"></span>
+            <button type="button" data-value="flipboard" role="radio">Flip</button>
+            <button type="button" data-value="sideswap"  role="radio">Swap</button>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-row">
+            <span class="field-label">Speed</span>
+            <span class="field-value" id="speedValue">1.2x</span>
+          </div>
+          <input type="range" class="slider" id="speedSlider" min="0.4" max="2.4" step="0.1" value="1.2">
+        </div>
+        <div class="field">
+          <div class="field-row">
+            <span class="field-label">Hover delay</span>
+            <span class="field-value" id="hoverValue">50 ms</span>
+          </div>
+          <input type="range" class="slider" id="hoverSlider" min="0" max="800" step="25" value="50">
+          <div class="preview-line">How long the knob has to hold near a point before the cards reorder. The knob still follows your cursor instantly.</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-label">Color</div>
+        <div class="field">
+          <div class="field-row">
+            <span class="field-label">Palette</span>
+            <span class="field-value" id="paletteName">Midnight</span>
+          </div>
+          <div class="palette-grid" id="paletteGrid"></div>
+        </div>
+        <div class="palette-legend">
+          <span><span class="legend-swatch" id="legendPrimary"></span>Primary <span class="hex-display" id="primaryHex"></span></span>
+          <span><span class="legend-swatch" id="legendSecondary"></span>Secondary <span class="hex-display" id="secondaryHex"></span></span>
+        </div>
+        <div class="preview-line">Primary drives the page background and plane panel. Secondary drives the knob, dot highlights, and accents. Both retune for dark and light themes.</div>
+      </section>
+
+      <section class="section">
+        <button class="reset-btn" id="resetBtn">Reset to defaults</button>
+      </section>
+
+      <div id="archiveSection"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============ Data ============ */
+const PLANE_ITEMS = [
+
+  /* ── AI TOOLING ──────────────────────────────────────── */
+  {
+    id: "cat-01", type: "Post", category: "AI Tooling",
+    qd: 11, fu: 78,
+    title: "Min Choi on Claude Design generating UI, designs, and animations from text",
+    by: "by Min Choi (@minchoi)", meta: "Apr 18, 2026",
+    url: "https://x.com/minchoi/status/2045705871527653794?s=12",
+    tags: ["Claude UI", "Claude Design", "Generative UI", "Prototyping", "Animation"],
+    summary: "Min Choi's hype thread on Claude Design, which he pitches as generating insane UI, designs, and animations directly from text prompts. Frames it as an inflection point for design work and shares 10 wild examples. Post landed roughly 918K views, 8.3K bookmarks, and 34.2K likes shortly after posting. The thread is short enough to burn through in under two minutes but the example links alone are worth an hour."
+  },
+  {
+    id: "cat-02", type: "Tool", category: "AI Tooling",
+    qd: 22, fu: 56,
+    title: "Tolaria — free macOS markdown knowledge base for humans and AI agents",
+    by: "by Luca Rossi (@lucaronin)", meta: "Apr 22, 2026",
+    url: "https://tolaria.md",
+    tags: ["Markdown", "Knowledge Base", "macOS", "Open Source", "AI Agents", "Personal PKM"],
+    summary: "Luca Rossi released Tolaria, a free and open-source macOS desktop app for managing markdown knowledge bases and letting AI agents and humans operate them together. He runs a 10,000-note personal workspace on it and frames Tolaria as his take on Karpathy's LLM wiki idea — a main collaboration surface where agents create new notes, link them to what exists, and edit existing ones because everything is just plain markdown files. No proprietary formats, no lock-in. Via @lucaronin on X."
+  },
+  {
+    id: "cat-03", type: "Video", category: "AI Tooling",
+    qd: 56, fu: 67,
+    title: "Andrej Karpathy's neural networks from scratch — the full 3-hour course",
+    by: "by Andrej Karpathy (YouTube)", meta: "Jan 18, 2026",
+    url: "https://youtube.com/@AndrejKarpathy",
+    tags: ["Neural Networks", "Educational", "Backpropagation", "Python", "From Scratch", "Karpathy"],
+    summary: "Karpathy's complete build-a-neural-network-from-scratch course: micrograd (a tiny autograd engine), makemore (a character-level language model), and a mini-GPT trained on Shakespeare. Targets people who understand Python and basic calculus but have no ML background — the entire dependency stack is numpy and matplotlib. Described by many in the ML community as the clearest first-principles ML education available anywhere, and the only course that leaves you understanding why backpropagation works rather than just knowing that it does."
+  },
+  {
+    id: "cat-04", type: "Post", category: "AI Tooling",
+    qd: 0, fu: 67,
+    title: "Stitch by Google open-sources the DESIGN.md specification",
+    by: "by Stitch by Google (@stitchbygoogle)", meta: "Apr 21, 2026",
+    url: "https://x.com/stitchbygoogle/status/2046624729403142320?s=12",
+    tags: ["DESIGN.md", "Design Systems", "Open Source", "Agents", "WCAG", "Figma Alternative"],
+    summary: "Stitch by Google is open-sourcing the draft spec for DESIGN.md so it can be used across any tool or platform. The file lets teams export and import design rules from project to project, giving agents explicit intent (what a color is for, what a spacing token means) and letting them validate choices against WCAG accessibility rules. David East walks through the shared visual language in the companion video. A two-minute read that reframes how design handoff could work when AI is in the loop."
+  },
+  {
+    id: "cat-05", type: "Article", category: "AI Tooling",
+    qd: 44, fu: 56,
+    title: "Building a local RAG pipeline with Ollama, ChromaDB, and 3 Python files",
+    by: "by Simon Willison (simonwillison.net)", meta: "Apr 3, 2026",
+    url: "https://simonwillison.net",
+    tags: ["RAG", "Vector DB", "Ollama", "ChromaDB", "Python", "Local LLM", "No Framework"],
+    summary: "Simon Willison walks through a three-file local RAG implementation: one script to chunk and embed documents into ChromaDB using Ollama's nomic-embed-text model, one to query the vector store and pass context to a local Mistral instance, and one Makefile to wire it together. The whole stack runs offline, costs nothing per query, and handles a 10,000-document corpus in under 4 seconds on an M2 MacBook Pro. The emphasis is on keeping it comprehensible — no frameworks, no abstractions. Read it once and you understand RAG end-to-end."
+  },
+
+  /* ── AI COMMENTARY ───────────────────────────────────── */
+  {
+    id: "cat-06", type: "Post", category: "AI Commentary",
+    qd: 11, fu: 89,
+    title: "Andrej Karpathy on why 'Software 2.0' is still the wrong mental model",
+    by: "by Andrej Karpathy (@karpathy)", meta: "Apr 30, 2026",
+    url: "https://x.com/karpathy",
+    tags: ["Software 2.0", "LLMs", "Systems Thinking", "Karpathy", "AI Framing"],
+    summary: "Karpathy argues that framing LLMs as 'Software 2.0' undersells the shift because it implies a continuous upgrade from traditional code. He proposes the better frame is Software ∞: systems that rewrite themselves on each call rather than being compiled once, making observability the central engineering challenge rather than training data quality. The post is short but the framing has been cited in a dozen subsequent threads — it changes what questions feel worth asking about these systems."
+  },
+  {
+    id: "cat-07", type: "Essay", category: "AI Commentary",
+    qd: 67, fu: 78,
+    title: "Scott Alexander's close read of Sam Altman's essay on AI and prosperity",
+    by: "by Scott Alexander (Astral Codex Ten)", meta: "Apr 15, 2026",
+    url: "https://astralcodexten.com",
+    tags: ["Sam Altman", "OpenAI", "AI Policy", "Scott Alexander", "AGI", "Wealth Distribution"],
+    summary: "Scott Alexander does a close read of Sam Altman's 3,000-word essay on AI and prosperity, separating the claims that are empirically specific from the ones that are structural rhetoric. Core observation: the essay contains no mechanism for how AI-generated abundance gets distributed, only assurances that it will be — which Alexander calls the same move made in every previous technology-optimism manifesto, from electrification to the internet. He ends with a genuinely generous counterpoint: maybe that's fine if the underlying technology is actually as transformative as claimed. One of the more honest pieces of AI commentary in recent memory."
+  },
+
+  /* ── MARKETS & RESEARCH ──────────────────────────────── */
+  {
+    id: "cat-08", type: "Post", category: "Markets & Research",
+    qd: 11, fu: 100,
+    title: "Kieran Goodwin on CCLFX liquidity and NAV risk",
+    by: "by Kieran Goodwin", meta: "Mar 27, 2026",
+    url: "https://x.com/kieranwgoodwin/status/2037551988217426126",
+    tags: ["Liquidity", "NAV Risk", "CCLFX", "Private Credit", "Interval Funds"],
+    summary: "Kieran Goodwin runs the numbers on CCLFX's liquidity situation, analyzing what 8 consecutive quarters of 5% NAV payouts would mean for the fund's $33.1B in assets relative to loan maturities and borrowings. The math is uncomfortable. Goodwin isn't predicting a gate but frames the structural mismatch clearly: the fund's quarterly redemption windows are calibrated to normal behavior, not the scenario where sentiment turns and everyone lines up at once. Essential reading if you're allocating client assets to interval funds in this rate environment."
+  },
+  {
+    id: "cat-09", type: "Longform", category: "Markets & Research",
+    qd: 89, fu: 89,
+    title: "AQR: when momentum crashes — drawdown anatomy across seven regimes, 1927-2025",
+    by: "by Cliff Asness (AQR Capital)", meta: "Mar 15, 2026",
+    url: "https://www.aqr.com/Insights/Research",
+    tags: ["Momentum", "Factor Investing", "Drawdown", "AQR", "Market Regimes", "Tail Risk"],
+    summary: "AQR's working paper dissects momentum crashes across seven market regimes from 1927 to 2025, finding that the worst drawdowns cluster in sharp reversal environments after extended bear markets. The paper tests whether diversifying across momentum definitions (price, earnings, analyst revision) meaningfully compresses tail risk and concludes that cross-asset momentum portfolios hold Sharpe ratios approximately 40% higher in the worst decile of momentum months than single-asset variants. Heavy reading but the regime classification framework in Section 3 alone is worth the time."
+  },
+  {
+    id: "cat-10", type: "Article", category: "Markets & Research",
+    qd: 56, fu: 100,
+    title: "Inside the private equity-insurance nexus — the FT investigation",
+    by: "by Malcolm Tucker (@bloodywanker913)", meta: "Jun 27, 2025",
+    url: "https://x.com/bloodywanker913/status/1938461430702837960",
+    tags: ["Private Equity", "Insurance", "Regulatory Risk", "Apollo", "Annuities", "FT"],
+    summary: "Malcolm Tucker flags the FT's investigation into the growing entanglement between private equity firms and insurance companies — specifically the Apollo-Athene model where PE firms acquire or partner with insurers, use policyholder float as cheap long-duration capital, and invest it in their own higher-yielding illiquid credit products. The piece covers the regulatory gap (insurance is state-regulated, not SEC-regulated), the systemic risk implications if the asset quality in those portfolios is overstated, and why the arrangement is structured in a way that makes independent verification nearly impossible."
+  },
+  {
+    id: "cat-11", type: "Podcast", category: "Markets & Research",
+    qd: 67, fu: 100,
+    title: "Howard Marks on why this rate environment might actually be different",
+    by: "by Howard Marks (Masters in Business / Bloomberg)", meta: "Apr 22, 2026",
+    url: "https://ritholtz.com/masters-in-business",
+    tags: ["Howard Marks", "Macro", "Credit Cycles", "Oaktree", "Interest Rates", "Investing"],
+    summary: "Howard Marks joins Barry Ritholtz for a 90-minute session on whether the structural break in interest rates post-2022 has fundamentally changed the rules for credit investors. Marks argues that the 40-year bond bull market created a generation of investors — including himself — whose intuitions about discount rates, cap rates, and equity premia were calibrated in an environment that no longer exists. The most honest part: he admits he doesn't know whether we're returning to 2%-rate normalcy or this is the new baseline, and explains why that uncertainty should change position sizing even when the asset looks cheap."
+  },
+  {
+    id: "cat-12", type: "Newsletter", category: "Markets & Research",
+    qd: 33, fu: 78,
+    title: "Ben Carlson: the case for being strategically boring",
+    by: "by Ben Carlson (A Wealth of Common Sense)", meta: "May 1, 2026",
+    url: "https://awealthofcommonsense.com",
+    tags: ["Index Investing", "Behavioral Finance", "Ben Carlson", "Wealth Management", "Drawdown"],
+    summary: "Ben Carlson makes the case that the most important skill in investing isn't picking the right assets but surviving the periods when your strategy underperforms — the hidden cost that most factor and active strategies don't account for in their backtests. He cites a 2025 Vanguard study showing investors in target-date funds who made no changes during the 2022 drawdown recovered to new highs 14 months before investors in the same fund who rebalanced out of equities during the correction. Carlson's writing is always approachable; this issue is particularly worth forwarding to clients who chase performance."
+  },
+
+  /* ── TAX & PLANNING ──────────────────────────────────── */
+  {
+    id: "cat-13", type: "Post", category: "Tax & Planning",
+    qd: 33, fu: 100,
+    title: "Michael Kitces on the retirement danger zone",
+    by: "by Michael Kitces (@michaelkitces)", meta: "Mar 22, 2026",
+    url: "https://x.com/michaelkitces/status/2035854079281217580",
+    tags: ["Retirement", "Sequence of Returns", "Kitces", "AresMemo", "Financial Planning"],
+    summary: "Kitces explains the retirement danger zone: the final decade before and first decade of retirement, where portfolio returns dwarf contributions and sequence-of-returns risk is at its absolute peak. A 20% loss at 58 is not the same as a 20% loss at 38 — at 38 you have 25 years of continued contributions to recover; at 58 you have withdrawals compounding the damage. The post includes a clean chart showing the asymmetry of impact by age. Short and quotable — the kind of thing you screenshot and keep."
+  },
+  {
+    id: "cat-14", type: "Article", category: "Tax & Planning",
+    qd: 44, fu: 100,
+    title: "529-to-Roth rollover: the 2026 rule changes most advisors are still missing",
+    by: "by Christine Benz (Morningstar)", meta: "Mar 5, 2026",
+    url: "https://morningstar.com",
+    tags: ["529", "Roth IRA", "SECURE 2.0", "Estate Planning", "Education Savings", "Benz"],
+    summary: "Christine Benz breaks down the three underappreciated constraints in SECURE 2.0's 529-to-Roth rollover provision: the account must have been open for at least 15 years, contributions and earnings from the last 5 years are ineligible, and rollovers count against the annual Roth IRA contribution limit. She argues the rule is most useful for over-funded 529s where the beneficiary won't attend an expensive school, rather than as a primary education savings strategy — a framing that flips how most planners are pitching it."
+  },
+
+  /* ── CURRENT EVENTS ──────────────────────────────────── */
+  {
+    id: "cat-15", type: "Post", category: "Current Events",
+    qd: 11, fu: 67,
+    title: "Charlie Bilello charts the dollar's fall since Liberation Day",
+    by: "by Charlie Bilello (@charliebilello)", meta: "May 2, 2026",
+    url: "https://x.com/charliebilello",
+    tags: ["Dollar", "DXY", "Trade Policy", "Tariffs", "Liberation Day", "Macro"],
+    summary: "Bilello charts the DXY since the April 2 tariff announcement, showing the dollar has fallen nearly 9% against the euro and 7.5% against the yen in six weeks — a historically unusual combination of equity, bond, and dollar weakness happening simultaneously. Notes this is the opposite of the traditional safe-haven pattern that held through 2008, 2018, and 2020, where dollar strength accompanied risk-off moves. If the dollar is no longer the world's crisis hedge, that's a structural shift worth understanding before it's consensus."
+  },
+  {
+    id: "cat-16", type: "Thread", category: "Current Events",
+    qd: 22, fu: 56,
+    title: "Marc Rubinstein revisits why Silicon Valley Bank collapsed in 48 hours",
+    by: "by Marc Rubinstein (@FTAlphaville)", meta: "May 1, 2026",
+    url: "https://x.com/MarcRubinstein",
+    tags: ["SVB", "Bank Run", "Deposit Insurance", "Silicon Valley", "Contagion", "2023 Retrospective"],
+    summary: "Marc Rubinstein's three-year retrospective argues the real SVB story isn't duration risk in the bond portfolio but a social coordination failure that converted a slow-moving solvency problem into an overnight bank run. He traces how a single VC's fund update email — visible to hundreds of GPs in competing funds — triggered the cascade, and asks whether professional group messaging has permanently changed the physics of bank runs. The thread ends with a structural question: the FDIC's deposit insurance cap hasn't changed, but the velocity at which a concentrated depositor base can coordinate withdrawals has increased by orders of magnitude."
+  },
+
+  /* ── CREATIVE & MEDIA ────────────────────────────────── */
+  {
+    id: "cat-17", type: "Video", category: "Creative & Media",
+    qd: 67, fu: 89,
+    title: "Every Frame a Painting: how Goodfellas' Copacabana one-take was made",
+    by: "by Every Frame a Painting (YouTube)", meta: "Jan 12, 2026",
+    url: "https://youtube.com/@everyframeapainting",
+    tags: ["Film", "Cinema", "Scorsese", "Long Take", "Cinematography", "To Watch"],
+    summary: "Every Frame a Painting returns to break down the Copacabana one-take sequence in Goodfellas frame by frame, explaining how Scorsese used blocking and production design to communicate Henry Hill's ascent without a word of dialogue. The episode covers the three months of rehearsal with the Copa's actual staff, how the shot's grammar changed tracking shots in prestige TV for the next 30 years, and why the sequence works as a moral argument — we fall for Henry the same way Henry falls for the life. One of the best video essays on craft made in recent years."
+  },
+  {
+    id: "cat-18", type: "Video", category: "Creative & Media",
+    qd: 89, fu: 100,
+    title: "Patrick (H) Willems on what the Severance Season 3 finale actually meant",
+    by: "by Patrick (H) Willems (YouTube)", meta: "May 4, 2026",
+    url: "https://youtube.com/@patrickhwillems",
+    tags: ["Severance", "Apple TV", "Film Analysis", "Mind-Body Dualism", "To Watch"],
+    summary: "Patrick Willems delivers his signature deep-read on the Severance Season 3 finale, arguing the final twist resolves the mind-body dualism thread planted in the pilot. The essay film traces the Lumon philosophy from the fictional Kier Eagan texts introduced in Season 1 all the way to the literal staging of the finale's last scene — showing the writers built toward a single philosophically coherent conclusion. Best watched after finishing the season; Willems is careful to put a clear spoiler warning before the substantive analysis begins."
+  },
+
+  /* ── LIFE & LEISURE ──────────────────────────────────── */
+  {
+    id: "cat-19", type: "Post", category: "Life & Leisure",
+    qd: 0, fu: 89,
+    title: "Wes Yang on why Tokyo's 7-Eleven beats every grocery store in the US",
+    by: "by Wes Yang (@wesyang)", meta: "Apr 28, 2026",
+    url: "https://x.com/wesyang",
+    tags: ["Japan", "Food", "Travel", "Convenience Stores", "Urbanism", "AresMemo"],
+    summary: "Wes Yang's viral thread cataloging the specific ways Japanese convenience stores — hot foods, onigiri variety, dessert quality, egg sandwiches — embarrass their American counterparts, framed through photos taken over a two-week Tokyo trip. The thread ends with a semi-serious case for the konbini as a model for urban food infrastructure that American city planners have largely ignored, touching on zoning, density, and what 'convenient' actually means when walkability is assumed. Funny and genuinely illuminating at the same time."
+  },
+  {
+    id: "cat-20", type: "Recipe", category: "Life & Leisure",
+    qd: 0, fu: 33,
+    title: "Kenji López-Alt's 15-minute Japanese egg salad sandwich (tamago sando)",
+    by: "by Kenji López-Alt (Serious Eats)", meta: "Mar 10, 2026",
+    url: "https://seriouseats.com",
+    tags: ["Recipe", "Japanese Food", "Sandwich", "Eggs", "Cooking", "Kewpie"],
+    summary: "Kenji's recipe for the convenience-store tamago sando achieves the signature fluffy-dense contrast through two techniques: boiling eggs in a precise rolling boil for exactly 9 minutes and folding the chopped yolks into Japanese Kewpie mayo before adding the whites. The shokupan (milk bread) is the structural key — any square pullman loaf with a tight crumb works as a substitute. Kenji estimates the sandwich costs $1.80 per serving if you already have Kewpie and shokupan in rotation. The kind of recipe you actually make rather than bookmark and forget."
+  },
+
+  /* ── SCIENCE & WORLD ─────────────────────────────────── */
+  {
+    id: "cat-21", type: "Article", category: "Science & World",
+    qd: 22, fu: 11,
+    title: "Ten squats every 45 minutes outperforms a 30-minute walk for blood sugar control",
+    by: "by Zib Atkins (@ayuswellness)", meta: "Apr 6, 2026",
+    url: "https://x.com/ayuswellness/status/2041079912438587749",
+    tags: ["Wellness", "Exercise", "Blood Sugar", "Sedentary Work", "Health Science"],
+    summary: "Zib Atkins cites a University of Texas study showing that 10 squats every hour controls blood sugar better than a full 30-minute walk, with the added benefit of boosting circulation during sedentary workdays. The mechanism is glucose transporter activation in muscle cells — brief, repeated contractions keep the glucose uptake pathway open in a way a single longer bout doesn't sustain across the day. Practical takeaway: set a 45-minute timer. You don't need a gym."
+  },
+  {
+    id: "cat-22", type: "Article", category: "Science & World",
+    qd: 44, fu: 44,
+    title: "CRISPR base editing is now being used to remove genetic disease risk before birth",
+    by: "by Antonio Regalado (MIT Technology Review)", meta: "Apr 10, 2026",
+    url: "https://technologyreview.com",
+    tags: ["CRISPR", "Gene Editing", "Base Editing", "Genetics", "Ethics", "Preimplantation"],
+    summary: "Antonio Regalado profiles the emerging application of CRISPR base editing — which changes a single DNA letter without cutting the double helix — to preimplantation embryos. Four clinics outside the US are now using the technique to remove variants associated with Huntington's and BRCA1/2. The piece carefully distinguishes base editing from He Jiankui's 2018 germline CRISPR work (the accuracy profile is fundamentally different), and surfaces the ethical divide between therapeutic correction of severe disease variants and the question of where that line sits. Essential context for anyone following the biotech regulatory landscape."
+  },
+  {
+    id: "cat-23", type: "Post", category: "Science & World",
+    qd: 11, fu: 100,
+    title: "New bioluminescent jellyfish found 2,300 meters beneath the Coral Sea",
+    by: "by Schmidt Ocean Institute", meta: "Apr 14, 2026",
+    url: "https://schmidtocean.org",
+    tags: ["Marine Biology", "Deep Sea", "Bioluminescence", "New Species", "Ocean", "Nature"],
+    summary: "Marine biologists working from the Schmidt Ocean Institute's Falkor vessel identified a new rhizostome jellyfish species at 2,300 meters depth in the Coral Sea, notable for emitting a steady blue-green bioluminescent pulse rather than the brief flash typical of deep-sea cnidarians. The mechanism — a continuous biochemical loop rather than a single-oxidation event — could inform low-power sensor design in underwater robotics. The species was cataloged entirely from ROV footage before physical collection. The video of the pulse is hypnotic."
+  },
+
+  /* ── LEADERSHIP ──────────────────────────────────────── */
+  {
+    id: "cat-24", type: "Essay", category: "Leadership",
+    qd: 78, fu: 78,
+    title: "Shane Parrish on Bezos's Type 1 / Type 2 decision framework — and where it breaks",
+    by: "by Shane Parrish (Farnam Street)", meta: "Mar 8, 2026",
+    url: "https://fs.blog",
+    tags: ["Decision Making", "Bezos", "Type 1/Type 2", "Mental Models", "Leadership", "Reversibility"],
+    summary: "Shane Parrish revisits Bezos's 1997 shareholder letter distinction between Type 1 (one-way door) and Type 2 (two-way door) decisions, arguing that the failure mode in most organizations is treating Type 2 decisions as Type 1. The essay maps this onto modern product teams and introduces a decision log practice — recording which type a decision was classified as at the time — to combat hindsight bias in retrospectives. The most useful part is the section on how urgency pressure causes Type 2 decisions to masquerade as Type 1, and the specific meeting structures that prevent that drift."
+  },
+  {
+    id: "cat-25", type: "Podcast", category: "Leadership",
+    qd: 89, fu: 67,
+    title: "Patrick Collison on the structure of ambitious organizations",
+    by: "by Dwarkesh Patel (The Dwarkesh Podcast)", meta: "Mar 30, 2026",
+    url: "https://dwarkeshpatel.com",
+    tags: ["Patrick Collison", "Stripe", "Organizational Design", "Talent", "Ambition", "Management"],
+    summary: "Patrick Collison sits down with Dwarkesh Patel for a three-hour conversation ranging from Stripe's internal capital allocation process to why Collison believes most organizations have a talent identification problem rather than a talent shortage problem. Key claim: ambitious organizations succeed not by hiring the smartest people but by creating conditions where smart people can identify and pursue the most important problems rather than the most legible ones. The section on how Stripe evaluates whether a problem is 'worth the organizational cost' of pursuing it is dense and worth replaying."
+  },
+
+  /* ── CULTURE ─────────────────────────────────────────── */
+  {
+    id: "cat-26", type: "Post", category: "Culture",
+    qd: 11, fu: 67,
+    title: "Ryan Holiday on the one Stoic practice that actually holds at 6 AM",
+    by: "by Ryan Holiday (@RyanHoliday)", meta: "Apr 25, 2026",
+    url: "https://x.com/RyanHoliday",
+    tags: ["Stoicism", "Morning Routine", "Premeditatio Malorum", "Habit", "Mental Models"],
+    summary: "Holiday argues that the premeditatio malorum practice — imagining everything that could go wrong with the day before it starts — is more effective in the first 10 minutes of waking than any positive visualization exercise, because it primes the prefrontal cortex to treat setbacks as expected rather than threatening. He cites NYU researcher Gabriele Oettingen's work on why positive visualization alone actually decreases follow-through. Short post, but the Oettingen research link at the bottom is worth following — her 'mental contrasting' framework is the academic version of what Holiday is describing."
+  },
+
+  /* ── CURIOSITIES ─────────────────────────────────────── */
+  {
+    id: "cat-27", type: "Post", category: "Curiosities",
+    qd: 11, fu: 100,
+    title: "The font that can't be copyrighted and the lawsuit that ended with a dictionary definition",
+    by: "by Kottke.org", meta: "Apr 8, 2026",
+    url: "https://kottke.org",
+    tags: ["Typography", "Copyright Law", "Fonts", "Helvetica", "Intellectual Property"],
+    summary: "Jason Kottke resurfaces the strange legal history of the Helvetica typeface — its core design elements were held non-copyrightable in 1988 because fonts were classified as industrial designs rather than artistic works, a ruling that led to dozens of Helvetica clones that are legally identical in structure but sell for a fraction of the license price. The post links to a law review article tracing how the Copyright Office's definition of 'useful article' applies to letterforms, and ends with the delightful fact that the word 'font' was added to the Oxford English Dictionary in the same year the ruling was handed down."
+  },
+  {
+    id: "cat-28", type: "Post", category: "Curiosities",
+    qd: 0, fu: 100,
+    title: "The man who convinced KGB interrogators he was a time traveler from 2026",
+    by: "by Atlas Obscura", meta: "Mar 22, 2026",
+    url: "https://atlasobscura.com",
+    tags: ["History", "Espionage", "Cold War", "KGB", "Curiosities", "1988"],
+    summary: "Atlas Obscura profiles a 1988 KGB file that surfaced in 2023 describing an American student who was detained in Moscow and, facing interrogation, claimed to be a time traveler from 2026 who had arrived accidentally. The file records the interrogators noting that several of his factual claims about events between 1988 and 2026 — which they checked against sealed predictions written by Soviet scientists — had a 71% accuracy rate, causing a brief internal panic before the case was classified. The student's identity remains unknown. Whether it's true or an elaborate KGB joke, it's extraordinary either way."
+  },
+
+  /* ── HISTORY ─────────────────────────────────────────── */
+  {
+    id: "cat-29", type: "Article", category: "History",
+    qd: 56, fu: 44,
+    title: "How the Ottoman land reform of 1858 created modern Middle East instability",
+    by: "by Avi Shlaim (London Review of Books)", meta: "Jan 30, 2026",
+    url: "https://lrb.co.uk",
+    tags: ["Ottoman Empire", "Middle East", "Land Reform", "History", "Colonialism", "Palestine"],
+    summary: "Historian Avi Shlaim traces a direct line from the Ottoman Land Code of 1858 — which converted communal tribal land tenure into individually titled private property — to the conditions that enabled European colonial powers to purchase large swaths of what became Mandatory Palestine, Syria, and Iraq from newly titled landowners who were often urban absentees rather than the cultivators who had worked the land for generations. Shlaim argues this single administrative act, intended to modernize Ottoman tax collection, is more causally important to understanding 20th-century Middle East conflict than the Sykes-Picot Agreement. Challenging and rewarding."
+  },
+  {
+    id: "cat-30", type: "Longform", category: "History",
+    qd: 67, fu: 56,
+    title: "Adam Tooze on the 18 months that built the modern financial system",
+    by: "by Adam Tooze (Substack)", meta: "Feb 6, 2026",
+    url: "https://adamtooze.substack.com",
+    tags: ["Bretton Woods", "Keynes", "Harry Dexter White", "IMF", "Global Finance", "1944"],
+    summary: "Adam Tooze profiles the 1944 Bretton Woods conference as a 22-day negotiation between Keynes, representing a near-bankrupt Britain, and Harry Dexter White, representing a creditor America, whose competing blueprints were collapsed into a hybrid that neither man wanted. Tooze argues the modern IMF and World Bank are best understood as White's structural vision with Keynesian vocabulary grafted on top — and that the instability visible in global currency markets today traces directly to that foundational compromise. The essay rewards slow reading; Tooze is operating at his best here."
+  },
+
+];
+
+const PLANE_CATEGORIES = {
+  'AI Tooling':         { hue: 245, c: 0.09 },
+  'AI Commentary':      { hue: 215, c: 0.07 },
+  'Markets & Research': { hue: 155, c: 0.08 },
+  'Tax & Planning':     { hue: 175, c: 0.06 },
+  'Current Events':     { hue: 10,  c: 0.08 },
+  'Creative & Media':   { hue: 30,  c: 0.08 },
+  'Life & Leisure':     { hue: 110, c: 0.07 },
+  'Science & World':    { hue: 195, c: 0.07 },
+  /* Original prototype categories kept as fallbacks */
+  'Engineering':        { hue: 205, c: 0.07 },
+  'Leadership':         { hue: 85,  c: 0.07 },
+  'Culture':            { hue: 20,  c: 0.08 },
+  'Curiosities':        { hue: 310, c: 0.07 },
+  'History':            { hue: 60,  c: 0.06 },
+  'Fiction':            { hue: 330, c: 0.06 },
+  'Design':             { hue: 280, c: 0.07 },
+  'Machine Learning':   { hue: 210, c: 0.08 },
+  'Lifestyle':          { hue: 120, c: 0.07 },
+};
+function categoryColors(name, theme) {
+  const c = PLANE_CATEGORIES[name] || { hue: 0, c: 0 };
+  if (theme === 'light') {
+    return {
+      fg: `oklch(38% ${c.c + 0.02} ${c.hue})`,
+      bg: `oklch(88% ${Math.min(c.c, 0.04)} ${c.hue} / 0.7)`,
+    };
+  }
+  return {
+    fg: `oklch(82% ${c.c + 0.04} ${c.hue})`,
+    bg: `oklch(30% ${c.c} ${c.hue} / 0.45)`,
+  };
+}
+
+const DIM = {
+  xLeft: 'Quick', xRight: 'Deep',
+  yTop:  'Fun',   yBottom: 'Useful',
+  xKey:  'qd',    yKey:    'fu',
+};
+
+const DEFAULTS = {
+  animation: 'sideswap',
+  speed: 1.2,                                   // legacy single-speed default
+  speedByAnimation: {                           // each animation has its own
+    sideswap: 1.2,
+    flipboard: 0.8,
+  },
+  hoverDelay: 50,
+  mainColor: '#0E1A2E',   // Primary (Midnight)
+  primaryColor: '#7BE0FF', // Secondary (Midnight)
+};
+
+/* ============ Curated palette presets ============ */
+/* Per ThePlane Dev notes 2026-05-06: limit color options to 10 named pairs. */
+const PALETTES = [
+  { name: 'Midnight', primary: '#0E1A2E', secondary: '#7BE0FF' },
+  { name: 'Mint',     primary: '#111827', secondary: '#6EE7B7' },
+  { name: 'Lime',     primary: '#18181B', secondary: '#A3E635' },
+  { name: 'Fern',     primary: '#2E332B', secondary: '#8BCF6A' },
+  { name: 'Orchid',   primary: '#111B33', secondary: '#C084FC' },
+  { name: 'Coral',    primary: '#262626', secondary: '#FB7185' },
+  { name: 'Teal',     primary: '#102A2C', secondary: '#67E8F9' },
+  { name: 'Rose',     primary: '#24162E', secondary: '#F0ABFC' },
+  { name: 'Amber',    primary: '#1F2937', secondary: '#FBBF24' },
+  { name: 'Sky',      primary: '#151A24', secondary: '#60A5FA' },
+];
+function findPaletteIndex(primaryHex, secondaryHex) {
+  const p = (primaryHex || '').toUpperCase();
+  const s = (secondaryHex || '').toUpperCase();
+  return PALETTES.findIndex(pal => pal.primary.toUpperCase() === p && pal.secondary.toUpperCase() === s);
+}
+
+// Base durations (ms). Divided by state.speed at animation time.
+const BASE = {
+  flipHalfDur: 450,    // each half of the double flip — total runtime ~900ms × 2 phases
+  flipPause:    40,    // brief beat between the two halves
+  sideswapExit:  360,
+  sideswapEnter: 420,
+  sideswapGap:    80,
+  sideswapStagger: 130,
+};
+
+/* ============ Glyphs ============ */
+function typeGlyph(type) {
+  const wrap = (inner) => `<svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+  switch (type) {
+    case 'Podcast':
+      return wrap('<circle cx="6" cy="5" r="2"/><path d="M3 9 Q6 7.5 9 9"/>');
+    case 'Video': case 'Doc': case 'Clip': case 'Talk': case 'Interview':
+      return wrap('<rect x="1.5" y="2.5" width="9" height="7" rx="1.2"/><path d="M5 4.5 L8 6 L5 7.5 Z" fill="currentColor" stroke="none"/>');
+    case 'Paper': case 'Article': case 'Essay': case 'Excerpt': case 'Newsletter': case 'Thread':
+      return wrap('<path d="M3 2 H8 L9.5 3.5 V10 H3 Z"/><path d="M4.5 5 H8 M4.5 7 H8"/>');
+    case 'Checklist':
+      return wrap('<path d="M2 3.5 L3 4.5 L5 2.5"/><path d="M2 7.5 L3 8.5 L5 6.5"/><path d="M6.5 3.5 H10 M6.5 7.5 H10"/>');
+    case 'Snippet':
+      return wrap('<path d="M4 3 L2 6 L4 9"/><path d="M8 3 L10 6 L8 9"/>');
+    case 'Recipe':
+      return wrap('<circle cx="6" cy="6" r="3.5"/><path d="M6 3 V6 L8 7"/>');
+    case 'Meme':
+      return wrap('<circle cx="6" cy="6" r="4"/><circle cx="4.5" cy="5" r="0.5" fill="currentColor"/><circle cx="7.5" cy="5" r="0.5" fill="currentColor"/><path d="M4.5 7.5 Q6 8.5 7.5 7.5"/>');
+    case 'Tutorial':
+      return wrap('<path d="M2 3.5 H10 V8.5 H2 Z"/><path d="M4 6 H8 M4 7.5 H7"/>');
+    case 'Post':
+      return wrap('<path d="M1.8 2.5 H10.2 V8 H6.5 L4.5 10 V8 H1.8 Z"/>');
+    case 'Tool':
+      return wrap('<circle cx="6" cy="6" r="3"/><path d="M6 1.5 V3 M6 9 V10.5 M1.5 6 H3 M9 6 H10.5"/>');
+    case 'Longform':
+      return wrap('<path d="M3 2 H8 L9.5 3.5 V10 H3 Z"/><path d="M4.5 4.5 H8 M4.5 6 H8 M4.5 7.5 H6.5"/>');
+    default:
+      return wrap('<circle cx="6" cy="6" r="4"/>');
+  }
+}
+function chevron(dir) {
+  const rot = { up: 0, down: 180, left: -90, right: 90 }[dir] || 0;
+  return `<svg width="12" height="8" viewBox="0 0 16 10" style="transform: rotate(${rot}deg); display: block">
+    <path d="M2 8 L8 2 L14 8" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+/* ============ Archive / Override helpers ============ */
+function loadArchived() {
+  try {
+    const arr = JSON.parse(localStorage.getItem('plane-archived') || '[]');
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch (e) { return new Set(); }
+}
+function loadOverrides() {
+  try {
+    const obj = JSON.parse(localStorage.getItem('plane-overrides') || '{}');
+    return (obj && typeof obj === 'object' && !Array.isArray(obj)) ? obj : {};
+  } catch (e) { return {}; }
+}
+function loadScoreLog() {
+  try {
+    const arr = JSON.parse(localStorage.getItem('plane-score-log') || '[]');
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+
+/* ============ State ============ */
+function readLS(key, fallback) {
+  try { const v = localStorage.getItem(key); return v == null ? fallback : v; }
+  catch (e) { return fallback; }
+}
+function clamp01(v) {
+  v = Number(v);
+  if (!isFinite(v)) return 0.5;
+  return Math.max(0, Math.min(1, v));
+}
+function loadPoint() {
+  try {
+    const raw = localStorage.getItem('plane-point');
+    if (raw) { const p = JSON.parse(raw); return { x: clamp01(p.x), y: clamp01(p.y) }; }
+  } catch (e) {}
+  return { x: 0.5, y: 0.5 };
+}
+function isValidAnim(a) { return a === 'sideswap' || a === 'flipboard'; }
+function clampNum(v, lo, hi, fb) { v = Number(v); if (!isFinite(v)) return fb; return Math.max(lo, Math.min(hi, v)); }
+
+/* ---------- Settings migration ----------
+   v2 (2026-05-06): hoverDelay default changed 0 → 50 ms. Existing devices
+     already had plane-hover-delay=0 saved, so without a migration the bumped
+     default never takes effect.
+   v3 (2026-05-06): Slide animation removed; speed becomes per-animation.
+     Any saved 'slide' selection coerces to 'sideswap'. Existing single
+     plane-speed value is folded into the new plane-speeds JSON map under
+     whichever animation is currently active. */
+const SETTINGS_VERSION = 3;
+(function migrateSettings() {
+  try {
+    const sv = parseInt(readLS('plane-settings-v', '1'), 10) || 1;
+    if (sv < 2) {
+      const hd = parseFloat(readLS('plane-hover-delay', '0'));
+      if (!isFinite(hd) || hd === 0) {
+        localStorage.setItem('plane-hover-delay', '50');
+      }
+    }
+    if (sv < 3) {
+      let savedAnim = readLS('plane-animation', DEFAULTS.animation);
+      if (savedAnim === 'slide') {
+        savedAnim = DEFAULTS.animation;
+        localStorage.setItem('plane-animation', savedAnim);
+      }
+      // Fold the legacy single speed into the new per-animation map.
+      const legacySpeed = parseFloat(readLS('plane-speed', String(DEFAULTS.speed)));
+      const seedMap = Object.assign({}, DEFAULTS.speedByAnimation);
+      if (isFinite(legacySpeed) && legacySpeed > 0 && (savedAnim in seedMap)) {
+        seedMap[savedAnim] = legacySpeed;
+      }
+      // Preserve anything already in plane-speeds (idempotent).
+      try {
+        const existing = JSON.parse(readLS('plane-speeds', '{}'));
+        for (const k in existing) {
+          const v = parseFloat(existing[k]);
+          if (isFinite(v) && v >= 0.4 && v <= 2.4) seedMap[k] = v;
+        }
+      } catch (e) {}
+      localStorage.setItem('plane-speeds', JSON.stringify(seedMap));
+    }
+    localStorage.setItem('plane-settings-v', String(SETTINGS_VERSION));
+  } catch (e) {}
+})();
+
+/* Read the per-animation speed map back. Always returns a sane object. */
+function loadSpeedMap() {
+  let raw;
+  try { raw = JSON.parse(readLS('plane-speeds', '{}')); }
+  catch (e) { raw = {}; }
+  const out = Object.assign({}, DEFAULTS.speedByAnimation);
+  for (const k of ['sideswap', 'flipboard']) {
+    const v = parseFloat(raw[k]);
+    if (isFinite(v)) out[k] = clampNum(v, 0.4, 2.4, DEFAULTS.speedByAnimation[k]);
+  }
+  return out;
+}
+
+/* App always opens on thePlane. Card-detail view persists across reload so a
+   tap-then-reload doesn't lose context, but the Settings page should never be
+   restored — reopening should drop the user back at the home plane. */
+function loadInitialView() {
+  const v = readLS('plane-view', 'plane');
+  return (v === 'plane' || v === 'card') ? v : 'plane';
+}
+
+const state = {
+  theme: readLS('plane-theme', 'dark'),
+  value: loadPoint(),
+  scatter: readLS('plane-scatter', '0') === '1',
+  hidden:  readLS('plane-hidden',  '0') === '1',
+  view:    loadInitialView(),
+  animation: (function() { const a = readLS('plane-animation', DEFAULTS.animation); return isValidAnim(a) ? a : DEFAULTS.animation; })(),
+  speeds:      loadSpeedMap(),
+  hoverDelay:  clampNum(readLS('plane-hover-delay', String(DEFAULTS.hoverDelay)), 0, 800, DEFAULTS.hoverDelay),
+  mainColor:    readLS('plane-main',    DEFAULTS.mainColor),
+  primaryColor: readLS('plane-primary', DEFAULTS.primaryColor),
+  dragging: false,
+  slots: [
+    { id: null, timers: [] },
+    { id: null, timers: [] },
+    { id: null, timers: [] },
+    { id: null, timers: [] },
+    { id: null, timers: [] },
+  ],
+  expandedId: readLS('plane-expanded-id', '') || null,
+  archived:   loadArchived(),
+  overrides:  loadOverrides(),
+  scoreLog:   loadScoreLog(),
+  editingId:  null,
+  editValue:  { x: 0.5, y: 0.5 },
+};
+
+// state.speed is a derived view of the current animation's stored speed.
+// Reads pull from state.speeds[state.animation]; writes update that slot.
+Object.defineProperty(state, 'speed', {
+  get() {
+    const v = this.speeds && this.speeds[this.animation];
+    return isFinite(v) ? v : DEFAULTS.speedByAnimation[this.animation] || DEFAULTS.speed;
+  },
+  set(v) {
+    const c = clampNum(v, 0.4, 2.4, DEFAULTS.speedByAnimation[this.animation] || DEFAULTS.speed);
+    if (!this.speeds) this.speeds = {};
+    this.speeds[this.animation] = c;
+  },
+});
+
+function persist() {
+  try {
+    localStorage.setItem('plane-theme',       state.theme);
+    localStorage.setItem('plane-point',       JSON.stringify({ x: state.value.x, y: state.value.y }));
+    localStorage.setItem('plane-scatter',     state.scatter ? '1' : '0');
+    localStorage.setItem('plane-hidden',      state.hidden  ? '1' : '0');
+    localStorage.setItem('plane-view',        state.view);
+    localStorage.setItem('plane-expanded-id', state.expandedId || '');
+    localStorage.setItem('plane-animation',   state.animation);
+    localStorage.setItem('plane-speeds',      JSON.stringify(state.speeds || {}));
+    localStorage.setItem('plane-hover-delay', String(state.hoverDelay));
+    localStorage.setItem('plane-main',        state.mainColor);
+    localStorage.setItem('plane-primary',     state.primaryColor);
+    localStorage.setItem('plane-archived',    JSON.stringify([...state.archived]));
+    localStorage.setItem('plane-overrides',   JSON.stringify(state.overrides  || {}));
+    localStorage.setItem('plane-score-log',   JSON.stringify(state.scoreLog   || []));
+  } catch (e) {}
+}
+
+/* ============ Distance + top-N ============ */
+function itemCoords(item) {
+  const ov = state.overrides[item.id];
+  return {
+    qd: ov != null ? ov.qd : (item[DIM.xKey] || 0),
+    fu: ov != null ? ov.fu : (item[DIM.yKey] || 0),
+  };
+}
+function distance(item) {
+  const { qd, fu } = itemCoords(item);
+  const dx = qd - state.value.x * 100;
+  const dy = fu - state.value.y * 100;
+  return Math.hypot(dx, dy);
+}
+function topN(n) {
+  return PLANE_ITEMS
+    .filter(it => !state.archived.has(it.id))
+    .map(it => ({ item: it, d: distance(it) }))
+    .sort((a, b) => a.d - b.d)
+    .slice(0, n);
+}
+
+/* ============ Card builders ============ */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[ch]));
+}
+function cardInnerHTML(item, dist) {
+  const cat = categoryColors(item.category, state.theme);
+  return `
+    <div class="card-meta">
+      <span class="cat-pill" style="background: ${cat.bg}; color: ${cat.fg}">
+        ${typeGlyph(item.type)}
+        <span>${escapeHtml(item.category)}</span>
+      </span>
+      <span class="card-meta-text">${escapeHtml(item.type)} · ${escapeHtml(item.meta)}</span>
+    </div>
+    <div class="card-title">${escapeHtml(item.title)}</div>
+    <div class="card-byline">
+      <span class="card-by">${escapeHtml(item.by)}</span>
+    </div>
+  `;
+}
+function attachCardHandlers(el, item) {
+  /* ── Swipe-left to archive ── */
+  let touchStartX = null, touchStartY = null, swiping = false, swipeX = 0, didSwipe = false;
+
+  el.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    swiping = false; swipeX = 0; didSwipe = false;
+    el.style.transition = '';
+  }, { passive: true });
+
+  el.addEventListener('touchmove', (e) => {
+    if (touchStartX === null) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = e.touches[0].clientY - touchStartY;
+    if (!swiping) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      // Only hijack clear left-horizontal swipes
+      if (Math.abs(dy) >= Math.abs(dx) || dx > 0) { touchStartX = null; return; }
+      swiping = true;
+    }
+    e.preventDefault();
+    swipeX = Math.min(0, dx);
+    el.style.transform = `translateX(${swipeX}px)`;
+    el.style.opacity = String(Math.max(0.3, 1 + swipeX / 200));
+  }, { passive: false });
+
+  el.addEventListener('touchend', () => {
+    if (!swiping) { touchStartX = null; return; }
+    didSwipe = true;
+    const SPD = state.speed;
+    if (swipeX < -72) {
+      const dur = Math.round(BASE.sideswapExit / SPD);
+      el.style.transition = `transform ${dur}ms cubic-bezier(.5,0,.2,1), opacity ${dur}ms ease`;
+      el.style.transform = 'translateX(-115%)';
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+      setTimeout(() => archiveItem(item.id), dur);
+    } else {
+      el.style.transition = 'transform 280ms cubic-bezier(.22,1,.36,1), opacity 200ms';
+      el.style.transform = '';
+      el.style.opacity = '';
+      setTimeout(() => { el.style.transition = ''; }, 300);
+    }
+    swiping = false; touchStartX = null; swipeX = 0;
+  });
+
+  /* ── Tap to open ── */
+  el.addEventListener('click', () => {
+    if (didSwipe) { didSwipe = false; return; }
+    state.expandedId = item.id;
+    state.view = 'card';
+    renderExpandedCard();
+    applyView();
+    persist();
+  });
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+  });
+}
+function buildCardInner(item, dist) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.id = item.id;
+  card.tabIndex = 0;
+  card.innerHTML = cardInnerHTML(item, dist);
+  attachCardHandlers(card, item);
+  return card;
+}
+function buildCard(item, dist) {
+  const wrap = document.createElement('div');
+  wrap.className = 'card-wrap';
+  wrap.dataset.itemId = item.id;
+  wrap.appendChild(buildCardInner(item, dist));
+  return wrap;
+}
+function fillFlipFace(faceEl, item, dist) {
+  faceEl.innerHTML = '';
+  if (!item) return;
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.id = item.id;
+  card.tabIndex = 0;
+  card.innerHTML = cardInnerHTML(item, dist);
+  attachCardHandlers(card, item);
+  faceEl.appendChild(card);
+}
+function fillFlipFaceBlank(faceEl) {
+  faceEl.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'card flip-blank-back';
+  card.setAttribute('aria-hidden', 'true');
+  faceEl.appendChild(card);
+}
+
+/* ============ Animation strategies ============ */
+const stack = () => document.getElementById('resultStack');
+
+function clearAllTimers() {
+  for (const s of state.slots) {
+    s.timers.forEach(clearTimeout);
+    s.timers = [];
+    s.id = null;
+  }
+}
+
+const STRAT = {
+  /* ---------- Sideswap: staggered horizontal exit/enter ---------- */
+  sideswap: {
+    setup(n) {
+      clearAllTimers();
+      const el = stack();
+      el.className = 'result-stack mode-sideswap';
+      el.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.dataset.slot = i;
+        el.appendChild(slot);
+      }
+    },
+    update(animate) {
+      const SPD = state.speed;
+      const EXIT_DUR  = BASE.sideswapExit  / SPD;
+      const ENTER_DUR = BASE.sideswapEnter / SPD;
+      const GAP_DUR   = BASE.sideswapGap   / SPD;
+      const STAGGER   = BASE.sideswapStagger / SPD;
+      const top = topN(currentCount);
+      for (let i = 0; i < currentCount; i++) {
+        const t = top[i];
+        const slotEl = document.querySelector(`#resultStack .slot[data-slot="${i}"]`);
+        if (!slotEl) continue;
+        const slot = state.slots[i];
+        const incomingId = t ? t.item.id : null;
+
+        if (!t) {
+          slot.timers.forEach(clearTimeout);
+          slot.timers = [];
+          slotEl.innerHTML = '';
+          slot.id = null;
+          continue;
+        }
+        if (!animate || !slot.id) {
+          slot.timers.forEach(clearTimeout);
+          slot.timers = [];
+          slotEl.innerHTML = '';
+          slotEl.appendChild(buildCard(t.item, t.d));
+          slot.id = incomingId;
+          continue;
+        }
+        if (slot.id === incomingId) continue;
+
+        slot.timers.forEach(clearTimeout);
+        slot.timers = [];
+        const dir = i % 2 === 0 ? 'right' : 'left';
+        const delay = i * STAGGER;
+        const exitAnim  = `planeSwapOut${dir === 'right' ? 'R' : 'L'} ${EXIT_DUR}ms cubic-bezier(.5,0,.2,1) both`;
+        const enterAnim = `planeSwapIn${dir === 'right' ? 'R' : 'L'} ${ENTER_DUR}ms cubic-bezier(.2,1.3,.3,1) both`;
+        const outgoing = slotEl.firstElementChild;
+
+        const t1 = setTimeout(() => {
+          if (outgoing && outgoing.parentNode) outgoing.style.animation = exitAnim;
+        }, delay);
+        const t2 = setTimeout(() => {
+          if (outgoing && outgoing.parentNode) outgoing.remove();
+          const incoming = buildCard(t.item, t.d);
+          incoming.style.animation = enterAnim;
+          slotEl.appendChild(incoming);
+        }, delay + EXIT_DUR + GAP_DUR);
+        slot.timers.push(t1, t2);
+        slot.id = incomingId;
+      }
+    },
+    teardown() {
+      clearAllTimers();
+      stack().innerHTML = '';
+    },
+  },
+
+  /* ---------- Flipboard: double rotateX flip with blank backside ----------
+     Phase A: rotateX(0)  → rotateX(180). User sees OLD card flip away to
+              reveal the BLANK back side. Front holds OLD; back is blank.
+     Phase B: rotateX(180) → rotateX(360). User sees BLANK back flip away
+              to reveal the NEW card. We swap the front content from OLD to
+              NEW at the start of phase B, while it's facing away from the
+              viewer (so the swap is invisible). At rotateX(360), the front
+              face is visible again, now showing NEW.
+     After both phases settle, snap the container back to rotateX(0) (no
+     transition) so the next flip starts from a clean state. The snap is
+     visually identical because rotateX(360) ≡ rotateX(0).                  */
+  flipboard: {
+    setup(n) {
+      clearAllTimers();
+      const el = stack();
+      el.className = 'result-stack mode-flipboard';
+      el.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot flip-slot';
+        slot.dataset.slot = i;
+        slot.innerHTML = `
+          <div class="flip-container">
+            <div class="flip-face flip-front"></div>
+            <div class="flip-face flip-back"></div>
+          </div>
+        `;
+        el.appendChild(slot);
+      }
+    },
+    update(animate) {
+      const SPD = state.speed;
+      const HALF = BASE.flipHalfDur / SPD;
+      const PAUSE = BASE.flipPause;          // not divided by speed — just a beat
+      const top = topN(currentCount);
+
+      for (let i = 0; i < currentCount; i++) {
+        const t = top[i];
+        const slotEl = document.querySelector(`#resultStack .slot[data-slot="${i}"]`);
+        if (!slotEl) continue;
+        const slot = state.slots[i];
+        const container = slotEl.querySelector('.flip-container');
+        const front     = slotEl.querySelector('.flip-front');
+        const back      = slotEl.querySelector('.flip-back');
+
+        if (!t) {
+          slot.timers.forEach(clearTimeout); slot.timers = [];
+          fillFlipFace(front, null);
+          fillFlipFaceBlank(back);
+          container.style.transition = 'none';
+          container.style.transform  = 'rotateX(0deg)';
+          slot.id = null;
+          continue;
+        }
+        const incomingId = t.item.id;
+
+        if (!animate || !slot.id) {
+          slot.timers.forEach(clearTimeout); slot.timers = [];
+          fillFlipFace(front, t.item, t.d);
+          fillFlipFaceBlank(back);
+          container.style.transition = 'none';
+          container.style.transform  = 'rotateX(0deg)';
+          slot.id = incomingId;
+          continue;
+        }
+        if (slot.id === incomingId) continue;
+
+        // Cancel any in-flight flip on this slot, snap to clean rest state.
+        slot.timers.forEach(clearTimeout); slot.timers = [];
+        const displayed = PLANE_ITEMS.find(p => p.id === slot.id);
+        fillFlipFace(front, displayed || null, null);  // front: OLD
+        fillFlipFaceBlank(back);                        // back:  BLANK
+        container.style.transition = 'none';
+        container.style.transform  = 'rotateX(0deg)';
+        void container.offsetHeight;  // layout flush
+
+        // Phase A: rotateX(0) → rotateX(180), revealing the BLANK back.
+        container.style.transition = `transform ${HALF}ms cubic-bezier(.45, .05, .25, 1)`;
+        requestAnimationFrame(() => {
+          container.style.transform = 'rotateX(180deg)';
+        });
+
+        // At HALF ms (front is now hidden, facing away): swap front to NEW.
+        const tSwap = setTimeout(() => {
+          fillFlipFace(front, t.item, t.d);
+        }, HALF);
+
+        // At HALF + PAUSE ms: kick phase B, rotateX(180) → rotateX(360),
+        // revealing the NEW card.
+        const tPhaseB = setTimeout(() => {
+          container.style.transform = 'rotateX(360deg)';
+        }, HALF + PAUSE);
+
+        // After both phases: reset container to rotateX(0) (visually
+        // identical to 360) and re-blank the back, ready for next flip.
+        const tEnd = setTimeout(() => {
+          fillFlipFace(front, t.item, t.d);
+          fillFlipFaceBlank(back);
+          container.style.transition = 'none';
+          container.style.transform  = 'rotateX(0deg)';
+        }, HALF + PAUSE + HALF + 30);
+        slot.timers.push(tSwap, tPhaseB, tEnd);
+        slot.id = incomingId;
+      }
+    },
+    teardown() {
+      clearAllTimers();
+      stack().innerHTML = '';
+    },
+  },
+};
+
+function getCount() { return state.hidden ? 5 : 3; }
+
+let currentMode = null;
+let currentCount = 0;
+function ensureStrategy() {
+  const n = getCount();
+  if (currentMode === state.animation && currentCount === n) return;
+  if (currentMode && STRAT[currentMode]) STRAT[currentMode].teardown();
+  currentMode = state.animation;
+  currentCount = n;
+  STRAT[currentMode].setup(n);
+}
+
+function updateResults(animate) {
+  ensureStrategy();
+  STRAT[currentMode].update(animate);
+  renderScatter();
+}
+
+/* ============ Hover-delay scheduler ============ */
+let hoverTimer = null;
+function scheduleResultsUpdate() {
+  if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+  if (state.hoverDelay > 0) {
+    hoverTimer = setTimeout(() => {
+      hoverTimer = null;
+      updateResults(true);
+    }, state.hoverDelay);
+  } else {
+    updateResults(true);
+  }
+}
+function flushPendingHover() {
+  if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+  updateResults(true);
+}
+
+/* ============ Plane setup ============ */
+const surface    = document.getElementById('planeSurface');
+const knob       = document.getElementById('knob');
+const knobRadial = document.getElementById('knobRadial');
+
+for (let i = 1; i < 4; i++) {
+  const t = (i / 4) * 100;
+  const h = document.createElement('div');
+  h.className = 'grid-h';
+  h.style.top = t + '%';
+  surface.appendChild(h);
+  const v = document.createElement('div');
+  v.className = 'grid-v';
+  v.style.left = t + '%';
+  surface.appendChild(v);
+}
+
+function setKnob() {
+  knob.style.left       = (state.value.x * 100) + '%';
+  knob.style.top        = (state.value.y * 100) + '%';
+  knobRadial.style.left = (state.value.x * 100) + '%';
+  knobRadial.style.top  = (state.value.y * 100) + '%';
+}
+
+function pointFromEvent(e) {
+  const r = surface.getBoundingClientRect();
+  const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e;
+  return {
+    x: clamp01((t.clientX - r.left) / r.width),
+    y: clamp01((t.clientY - r.top)  / r.height),
+  };
+}
+
+function onDown(e) {
+  state.dragging = true;
+  surface.classList.add('dragging');
+  knob.classList.add('dragging');
+  state.value = pointFromEvent(e);
+  setKnob();
+  scheduleResultsUpdate();
+}
+function onMove(e) {
+  if (!state.dragging) return;
+  if (e.cancelable) e.preventDefault();
+  state.value = pointFromEvent(e);
+  setKnob();
+  scheduleResultsUpdate();
+}
+function onUp() {
+  if (!state.dragging) return;
+  state.dragging = false;
+  surface.classList.remove('dragging');
+  knob.classList.remove('dragging');
+  flushPendingHover();
+  persist();
+}
+
+surface.addEventListener('mousedown',  onDown);
+surface.addEventListener('touchstart', onDown, { passive: true });
+window.addEventListener('mousemove',  onMove);
+window.addEventListener('touchmove',  onMove, { passive: false });
+window.addEventListener('mouseup',    onUp);
+window.addEventListener('touchend',   onUp);
+
+/* ============ Scatter dots ============ */
+function renderScatter() {
+  surface.querySelectorAll('.scatter-dot').forEach(n => n.remove());
+  if (!state.scatter) return;
+  const top = new Set(topN(currentCount || 3).map(t => t.item.id));
+  PLANE_ITEMS.filter(it => !state.archived.has(it.id)).forEach(it => {
+    const { qd, fu } = itemCoords(it);
+    const dot = document.createElement('div');
+    dot.className = 'scatter-dot' + (top.has(it.id) ? ' high' : '');
+    dot.style.left = qd + '%';
+    dot.style.top  = fu + '%';
+    surface.appendChild(dot);
+  });
+}
+
+/* ============ Axis labels ============ */
+function renderAxes() {
+  // axesLabel now shows static 'beta' label — not updated dynamically
+  document.getElementById('axisTop').innerHTML    = chevron('up')   + `<span>${DIM.yTop}</span>`;
+  document.getElementById('axisBottom').innerHTML = `<span>${DIM.yBottom}</span>` + chevron('down');
+  document.getElementById('axisLeft').innerHTML   = chevron('down') + `<span>${DIM.xLeft}</span>`;
+  document.getElementById('axisRight').innerHTML  = `<span>${DIM.xRight}</span>` + chevron('down');
+}
+
+/* ============ Theme + buttons ============ */
+function moonIcon() {
+  return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+    <path d="M11 8.5 A4.5 4.5 0 0 1 5.5 3 A4.5 4.5 0 1 0 11 8.5 Z" fill="currentColor"/>
+  </svg>`;
+}
+function sunIcon() {
+  let rays = '';
+  [0,45,90,135,180,225,270,315].forEach(a => {
+    rays += `<line x1="7" y1="1.5" x2="7" y2="3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" transform="rotate(${a} 7 7)"/>`;
+  });
+  return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+    <circle cx="7" cy="7" r="2.4" fill="currentColor"/>
+    ${rays}
+  </svg>`;
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', state.theme);
+  for (const id of ['themeBtn', 'themeBtn2', 'themeBtn3', 'themeBtn4']) {
+    const btn = document.getElementById(id);
+    if (!btn) continue;
+    btn.innerHTML = state.theme === 'dark' ? moonIcon() : sunIcon();
+    btn.title = state.theme === 'dark' ? 'Switch to light' : 'Switch to dark';
+  }
+  if (currentMode) STRAT[currentMode].setup(currentCount || getCount());
+  updateResults(false);
+}
+
+document.getElementById('themeBtn').addEventListener('click',  toggleTheme);
+document.getElementById('themeBtn2').addEventListener('click', toggleTheme);
+document.getElementById('themeBtn3').addEventListener('click', toggleTheme);
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  applyTheme();
+  applyColorOverrides();
+  persist();
+}
+
+const scatterBtn = document.getElementById('scatterBtn');
+function applyScatterBtn() {
+  scatterBtn.setAttribute('aria-pressed', state.scatter ? 'true' : 'false');
+  scatterBtn.textContent = state.scatter ? 'Hide scatter' : 'Scatter';
+}
+scatterBtn.addEventListener('click', () => {
+  state.scatter = !state.scatter;
+  applyScatterBtn();
+  renderScatter();
+  persist();
+});
+
+const hideBtn = document.getElementById('hidePlaneBtn');
+function applyHidden() {
+  document.body.dataset.planeHidden = state.hidden ? '1' : '0';
+  hideBtn.textContent = state.hidden ? 'Show' : 'Hide';
+}
+hideBtn.addEventListener('click', () => {
+  state.hidden = !state.hidden;
+  applyHidden();
+  ensureStrategy();
+  updateResults(false);
+  persist();
+});
+document.getElementById('planeRestore').addEventListener('click', () => {
+  state.hidden = false;
+  applyHidden();
+  ensureStrategy();
+  updateResults(false);
+  persist();
+});
+
+/* ============ View switching ============ */
+function applyView() {
+  // Defensive: don't restore card view if no expanded item, fall back to plane
+  if (state.view === 'card') {
+    const item = PLANE_ITEMS.find(p => p.id === state.expandedId);
+    if (!item) {
+      state.view = 'plane';
+      state.expandedId = null;
+    } else {
+      renderExpandedCard();
+    }
+  }
+  if (state.view === 'edit') {
+    const item = PLANE_ITEMS.find(p => p.id === state.editingId);
+    if (!item) {
+      state.view = state.expandedId ? 'card' : 'plane';
+      state.editingId = null;
+    } else {
+      renderEditOverlay(item);
+    }
+  }
+  document.body.dataset.view = state.view;
+}
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  state.view = 'settings';
+  renderSettingsArchive();
+  applyView();
+  persist();
+});
+document.getElementById('backBtn').addEventListener('click', () => {
+  state.view = 'plane';
+  applyView();
+  persist();
+});
+
+/* ============ Card detail view ============ */
+const GEAR_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+const ARCHIVE_SVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>`;
+
+function renderExpandedCard() {
+  const item = PLANE_ITEMS.find(p => p.id === state.expandedId);
+  const el = document.getElementById('expandedCard');
+  const meta = document.getElementById('cardMetaLine');
+  if (!item) {
+    if (el) el.innerHTML = '';
+    if (meta) meta.textContent = '';
+    return;
+  }
+  const cat = categoryColors(item.category, state.theme);
+  if (meta) meta.textContent = `${item.type} · ${item.category}`;
+  const tags = (item.tags || []).map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join('');
+  const url = item.url
+    ? `<a class="open-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">Open</a>`
+    : '<span></span>';
+  const hasOverride = !!state.overrides[item.id];
+  el.innerHTML = `
+    <button class="card-edit-btn" id="cardEditBtn" type="button" aria-label="Edit position" title="Edit position${hasOverride ? ' (overridden)' : ''}">
+      ${GEAR_SVG}
+    </button>
+    <div class="card-meta">
+      <span class="cat-pill" style="background: ${cat.bg}; color: ${cat.fg}">
+        ${typeGlyph(item.type)}
+        <span>${escapeHtml(item.category)}</span>
+      </span>
+      <span class="card-meta-text">${escapeHtml(item.type)} · ${escapeHtml(item.meta || '')}</span>
+    </div>
+    <h2 class="expanded-title">${escapeHtml(item.title)}</h2>
+    <div class="expanded-by">${escapeHtml(item.by || '')}</div>
+    ${item.summary ? `<div class="expanded-summary">${escapeHtml(item.summary)}</div>` : ''}
+    ${tags ? `<div class="expanded-tags">${tags}</div>` : ''}
+    <div class="expanded-actions">
+      ${url}
+      <button class="archive-btn" id="archiveCurrBtn" type="button">${ARCHIVE_SVG} Archive</button>
+    </div>
+  `;
+  const editBtn = el.querySelector('#cardEditBtn');
+  if (editBtn) editBtn.addEventListener('click', () => openEditView(state.expandedId));
+  const archBtn = el.querySelector('#archiveCurrBtn');
+  if (archBtn) archBtn.addEventListener('click', () => archiveItem(state.expandedId));
+}
+
+document.getElementById('cardBackBtn').addEventListener('click', () => {
+  state.view = 'plane';
+  state.expandedId = null;
+  applyView();
+  persist();
+});
+
+/* ============ Color override system ============ */
+function hexToOklch(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '');
+  if (!m) return { l: 0.7, c: 0.15, h: 220 };
+  const r = parseInt(m[1], 16) / 255;
+  const g = parseInt(m[2], 16) / 255;
+  const b = parseInt(m[3], 16) / 255;
+  const lin = (v) => (v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+  const lr = lin(r), lg = lin(g), lb = lin(b);
+  const l_ = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb);
+  const m_ = Math.cbrt(0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb);
+  const s_ = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb);
+  const L  = 0.2104542553*l_ + 0.7936177850*m_ - 0.0040720468*s_;
+  const a  = 1.9779984951*l_ - 2.4285922050*m_ + 0.4505937099*s_;
+  const bb = 0.0259040371*l_ + 0.7827717662*m_ - 0.8086757660*s_;
+  const C  = Math.sqrt(a*a + bb*bb);
+  let H = (Math.atan2(bb, a) * 180) / Math.PI;
+  if (H < 0) H += 360;
+  return { l: L, c: C, h: H };
+}
+
+function buildOverridesFor(mainHex, primaryHex, theme) {
+  const p = hexToOklch(primaryHex);
+  const m = hexToOklch(mainHex);
+  const ph = p.h.toFixed(1), pc = Math.min(p.c, 0.22).toFixed(3);
+  const mh = m.h.toFixed(1), mc = Math.min(m.c, 0.10).toFixed(3);
+  if (theme === 'dark') {
+    return `
+      --page-bg: ${mainHex};
+      --page-bg-grad-a: oklch(30% ${mc} ${mh} / 0.45);
+      --page-bg-grad-b: oklch(22% ${(Math.min(m.c, 0.08)).toFixed(3)} ${mh} / 0.35);
+      --plane-panel-a: oklch(26% ${mc} ${mh});
+      --plane-panel-b: oklch(18% ${(Math.min(m.c, 0.06)).toFixed(3)} ${mh});
+      --plane-fg-mute: oklch(94% 0.04 ${ph} / 0.62);
+      --plane-fg-faint:oklch(94% 0.04 ${ph} / 0.28);
+      --plane-chrome:  oklch(94% 0.04 ${ph} / 0.55);
+      --plane-knob-grad: radial-gradient(circle at 35% 28%, oklch(92% ${pc} ${ph}) 0%, oklch(70% ${pc} ${ph}) 70%);
+      --plane-knob-ring: oklch(90% ${pc} ${ph} / 0.35);
+      --plane-knob-border: oklch(30% 0.08 ${ph});
+      --plane-knob-center: oklch(22% 0.05 ${ph} / 0.45);
+      --plane-radial: radial-gradient(circle, oklch(84% ${pc} ${ph} / 0.22) 0%, oklch(84% ${pc} ${ph} / 0) 55%);
+      --plane-dot-base: oklch(94% 0.04 ${ph} / 0.28);
+      --plane-dot-high: oklch(84% ${pc} ${ph});
+    `;
+  }
+  return `
+    --page-bg: oklch(96% ${(Math.min(m.c, 0.02)).toFixed(3)} ${mh});
+    --plane-panel-a: oklch(92% ${(Math.min(m.c, 0.04)).toFixed(3)} ${mh});
+    --plane-panel-b: oklch(86% ${(Math.min(m.c, 0.05)).toFixed(3)} ${mh});
+    --plane-fg-mute: oklch(34% 0.06 ${ph} / 0.62);
+    --plane-fg-faint:oklch(34% 0.06 ${ph} / 0.28);
+    --plane-chrome:  oklch(34% 0.06 ${ph} / 0.5);
+    --plane-knob-grad: radial-gradient(circle at 35% 28%, oklch(58% ${pc} ${ph}) 0%, oklch(40% ${pc} ${ph}) 70%);
+    --plane-knob-ring: oklch(100% 0 0 / 0.5);
+    --plane-knob-border: oklch(24% ${pc} ${ph});
+    --plane-knob-center: oklch(100% 0 0 / 0.3);
+    --plane-radial: radial-gradient(circle, oklch(48% ${pc} ${ph} / 0.18) 0%, oklch(48% ${pc} ${ph} / 0) 55%);
+    --plane-dot-base: oklch(34% 0.06 ${ph} / 0.28);
+    --plane-dot-high: oklch(50% ${pc} ${ph});
+  `;
+}
+
+function applyColorOverrides() {
+  const dark  = buildOverridesFor(state.mainColor, state.primaryColor, 'dark');
+  const light = buildOverridesFor(state.mainColor, state.primaryColor, 'light');
+  let el = document.getElementById('colorOverrides');
+  if (!el) {
+    el = document.createElement('style');
+    el.id = 'colorOverrides';
+    document.head.appendChild(el);
+  }
+  el.textContent =
+    `:root[data-theme="dark"] { ${dark} }\n` +
+    `:root[data-theme="light"] { ${light} }`;
+}
+
+/* ============ Settings controls ============ */
+const speedSlider    = document.getElementById('speedSlider');
+const speedValue     = document.getElementById('speedValue');
+const hoverSlider    = document.getElementById('hoverSlider');
+const hoverValue     = document.getElementById('hoverValue');
+const animationSeg   = document.getElementById('animationSeg');
+const segThumb       = animationSeg.querySelector('.seg-thumb');
+const paletteGrid    = document.getElementById('paletteGrid');
+const paletteName    = document.getElementById('paletteName');
+const legendPrimary  = document.getElementById('legendPrimary');
+const legendSecondary= document.getElementById('legendSecondary');
+const primaryHex     = document.getElementById('primaryHex');
+const secondaryHex   = document.getElementById('secondaryHex');
+const resetBtn       = document.getElementById('resetBtn');
+
+/* Render the 10 curated palette tiles */
+function renderPaletteGrid() {
+  paletteGrid.innerHTML = PALETTES.map((p, i) => {
+    return `<button type="button"
+        class="palette-tile"
+        data-index="${i}"
+        aria-pressed="false"
+        title="${p.name} — Primary ${p.primary} · Secondary ${p.secondary}"
+        style="--tile-primary:${p.primary};--tile-secondary:${p.secondary}">
+      <span class="tile-secondary"></span>
+      <span class="tile-name">${p.name}</span>
+    </button>`;
+  }).join('');
+}
+function applyPaletteSelection() {
+  let idx = findPaletteIndex(state.mainColor, state.primaryColor);
+  if (idx < 0) idx = 0;
+  paletteGrid.querySelectorAll('.palette-tile').forEach((t, i) => {
+    t.setAttribute('aria-pressed', i === idx ? 'true' : 'false');
+  });
+  const p = PALETTES[idx];
+  paletteName.textContent = p.name;
+  primaryHex.textContent   = p.primary.toUpperCase();
+  secondaryHex.textContent = p.secondary.toUpperCase();
+  legendPrimary.style.background   = p.primary;
+  legendSecondary.style.background = p.secondary;
+}
+paletteGrid.addEventListener('click', (e) => {
+  const btn = e.target.closest('.palette-tile');
+  if (!btn) return;
+  const idx = parseInt(btn.dataset.index, 10);
+  if (isNaN(idx) || !PALETTES[idx]) return;
+  const p = PALETTES[idx];
+  state.mainColor    = p.primary;
+  state.primaryColor = p.secondary;
+  applyPaletteSelection();
+  applyColorOverrides();
+  persist();
+});
+
+function applyAnimationSeg() {
+  const buttons = animationSeg.querySelectorAll('button[data-value]');
+  let idx = 0;
+  buttons.forEach((b, i) => {
+    const on = b.dataset.value === state.animation;
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (on) idx = i;
+  });
+  const n = buttons.length;
+  segThumb.style.left  = `calc(3px + ${idx} * (100% - 6px) / ${n})`;
+  segThumb.style.width = `calc((100% - 6px) / ${n})`;
+}
+animationSeg.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-value]');
+  if (!btn) return;
+  const v = btn.dataset.value;
+  if (!isValidAnim(v) || v === state.animation) return;
+  state.animation = v;
+  applyAnimationSeg();
+  applySpeed();   // slider snaps to this animation's stored speed
+  ensureStrategy();
+  updateResults(false);
+  persist();
+});
+
+function applySpeed() {
+  // state.speed reads through the per-animation map via the getter above.
+  speedSlider.value = String(state.speed);
+  speedValue.textContent = state.speed.toFixed(1) + 'x';
+}
+speedSlider.addEventListener('input', () => {
+  // Setter on state.speed routes the value to state.speeds[state.animation].
+  state.speed = parseFloat(speedSlider.value);
+  speedValue.textContent = state.speed.toFixed(1) + 'x';
+});
+speedSlider.addEventListener('change', () => persist());
+
+function applyHover() {
+  hoverSlider.value = String(state.hoverDelay);
+  hoverValue.textContent = Math.round(state.hoverDelay) + ' ms';
+}
+hoverSlider.addEventListener('input', () => {
+  state.hoverDelay = parseInt(hoverSlider.value, 10) || 0;
+  hoverValue.textContent = state.hoverDelay + ' ms';
+});
+hoverSlider.addEventListener('change', () => persist());
+
+function applyColorInputs() { applyPaletteSelection(); }
+
+resetBtn.addEventListener('click', () => {
+  state.animation    = DEFAULTS.animation;
+  state.speeds       = Object.assign({}, DEFAULTS.speedByAnimation);
+  state.hoverDelay   = DEFAULTS.hoverDelay;
+  state.mainColor    = DEFAULTS.mainColor;
+  state.primaryColor = DEFAULTS.primaryColor;
+  applyAnimationSeg();
+  applySpeed();
+  applyHover();
+  applyPaletteSelection();
+  applyColorOverrides();
+  ensureStrategy();
+  updateResults(false);
+  persist();
+});
+
+/* ============ Archive ============ */
+function archiveItem(id) {
+  if (!id) return;
+  state.archived.add(id);
+  if (state.expandedId === id) {
+    state.view = 'plane';
+    state.expandedId = null;
+    applyView();
+  }
+  persist();
+  updateResults(true);
+  renderSettingsArchive();
+}
+function restoreItem(id) {
+  state.archived.delete(id);
+  persist();
+  updateResults(true);
+  renderSettingsArchive();
+}
+
+/* ============ Settings archive section ============ */
+function renderSettingsArchive() {
+  const el = document.getElementById('archiveSection');
+  if (!el) return;
+  const ids = [...state.archived];
+  if (ids.length === 0) { el.innerHTML = ''; return; }
+  const items = ids.map(id => PLANE_ITEMS.find(it => it.id === id)).filter(Boolean);
+  el.innerHTML = `
+    <section class="section">
+      <div class="section-label">Archive &nbsp;(${items.length})</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${items.map(it => `
+          <div class="archived-item">
+            <span class="archived-item-title">${escapeHtml(it.title)}</span>
+            <button class="restore-item-btn" data-restore-id="${escapeHtml(it.id)}" type="button">Restore</button>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+  `;
+  el.querySelectorAll('[data-restore-id]').forEach(btn => {
+    btn.addEventListener('click', () => restoreItem(btn.dataset.restoreId));
+  });
+}
+
+/* ============ Edit Position overlay ============ */
+function openEditView(id) {
+  const item = PLANE_ITEMS.find(it => it.id === id);
+  if (!item) return;
+  state.editingId = id;
+  const { qd, fu } = itemCoords(item);
+  state.editValue = { x: qd / 100, y: fu / 100 };
+  state.view = 'edit';
+  applyView();   // renderEditOverlay called from applyView
+}
+
+function renderEditOverlay(item) {
+  const cat = categoryColors(item.category, state.theme);
+  const preview = document.getElementById('editItemPreview');
+  if (preview) {
+    preview.innerHTML = `
+      <span class="cat-pill" style="background:${cat.bg};color:${cat.fg};flex-shrink:0;">
+        ${typeGlyph(item.type)}<span>${escapeHtml(item.category)}</span>
+      </span>
+      <span style="font-size:13px;font-weight:500;color:var(--fg);line-height:1.3;">${escapeHtml(item.title)}</span>
+    `;
+  }
+  const metaLine = document.getElementById('editMetaLine');
+  if (metaLine) metaLine.textContent = `${item.type} · ${item.category}`;
+
+  document.getElementById('editAxisTop').innerHTML    = chevron('up')   + `<span>${DIM.yTop}</span>`;
+  document.getElementById('editAxisBottom').innerHTML = `<span>${DIM.yBottom}</span>` + chevron('down');
+  document.getElementById('editAxisLeft').innerHTML   = chevron('down') + `<span>${DIM.xLeft}</span>`;
+  document.getElementById('editAxisRight').innerHTML  = `<span>${DIM.xRight}</span>` + chevron('down');
+
+  // Ghost dot = original AI-scored position
+  const origDot = document.getElementById('editOrigDot');
+  if (origDot) {
+    origDot.style.left = (item[DIM.xKey] || 0) + '%';
+    origDot.style.top  = (item[DIM.yKey] || 0) + '%';
+  }
+  setEditKnob();
+  updateEditCoords();
+}
+
+function setEditKnob() {
+  const k  = document.getElementById('editKnob');
+  const r  = document.getElementById('editKnobRadial');
+  if (k) { k.style.left = (state.editValue.x * 100) + '%'; k.style.top = (state.editValue.y * 100) + '%'; }
+  if (r) { r.style.left = (state.editValue.x * 100) + '%'; r.style.top = (state.editValue.y * 100) + '%'; }
+}
+
+function updateEditCoords() {
+  const el = document.getElementById('editCoords');
+  if (!el) return;
+  const qd = Math.round(state.editValue.x * 100);
+  const fu = Math.round(state.editValue.y * 100);
+  el.textContent = `${DIM.xLeft} ↔ ${DIM.xRight}  ${qd}  ·  ${DIM.yTop} ↔ ${DIM.yBottom}  ${fu}`;
+}
+
+function saveEditPosition() {
+  const id   = state.editingId;
+  const item = PLANE_ITEMS.find(it => it.id === id);
+  if (!item) { exitEditView(); return; }
+
+  const newQd = Math.round(state.editValue.x * 100);
+  const newFu = Math.round(state.editValue.y * 100);
+
+  // Apply coordinate override
+  state.overrides[id] = { qd: newQd, fu: newFu };
+
+  // Log entry for fine-tuning — captures all scoring inputs + original AI coords + user correction
+  const logEntry = {
+    id:          item.id,
+    title:       item.title,
+    type:        item.type,
+    category:    item.category,
+    meta:        item.meta,
+    by:          item.by,
+    tags:        item.tags,
+    summary:     item.summary,
+    originalQd:  item[DIM.xKey],
+    originalFu:  item[DIM.yKey],
+    userQd:      newQd,
+    userFu:      newFu,
+    savedAt:     new Date().toISOString(),
+  };
+  const existingIdx = state.scoreLog.findIndex(e => e.id === id);
+  if (existingIdx >= 0) state.scoreLog[existingIdx] = logEntry;
+  else state.scoreLog.push(logEntry);
+
+  persist();
+  updateResults(true);
+  exitEditView();
+}
+
+function exitEditView() {
+  state.editingId = null;
+  state.view = state.expandedId ? 'card' : 'plane';
+  if (state.view === 'card') renderExpandedCard(); // refresh gear highlight
+  applyView();
+}
+
+/* Edit plane drag */
+const editSurface    = document.getElementById('editPlaneSurface');
+const editKnobEl     = document.getElementById('editKnob');
+const editKnobRadial = document.getElementById('editKnobRadial');
+let   editDragging   = false;
+
+// Add grid tick lines to the edit plane surface
+(function() {
+  for (let i = 1; i < 4; i++) {
+    const t = (i / 4) * 100;
+    const h = document.createElement('div'); h.className = 'grid-h'; h.style.top  = t + '%'; editSurface.appendChild(h);
+    const v = document.createElement('div'); v.className = 'grid-v'; v.style.left = t + '%'; editSurface.appendChild(v);
+  }
+})();
+
+function editPointFromEvent(e) {
+  const r = editSurface.getBoundingClientRect();
+  const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e;
+  return { x: clamp01((t.clientX - r.left) / r.width), y: clamp01((t.clientY - r.top) / r.height) };
+}
+function onEditDown(e) {
+  editDragging = true;
+  editSurface.classList.add('dragging');
+  editKnobEl.classList.add('dragging');
+  state.editValue = editPointFromEvent(e);
+  setEditKnob(); updateEditCoords();
+}
+function onEditMove(e) {
+  if (!editDragging) return;
+  if (e.cancelable) e.preventDefault();
+  state.editValue = editPointFromEvent(e);
+  setEditKnob(); updateEditCoords();
+}
+function onEditUp() {
+  if (!editDragging) return;
+  editDragging = false;
+  editSurface.classList.remove('dragging');
+  editKnobEl.classList.remove('dragging');
+}
+editSurface.addEventListener('mousedown',  onEditDown);
+editSurface.addEventListener('touchstart', onEditDown, { passive: true });
+window.addEventListener('mousemove', (e) => { if (editDragging) onEditMove(e); });
+window.addEventListener('touchmove', (e) => { if (editDragging) onEditMove(e); }, { passive: false });
+window.addEventListener('mouseup',   () => { if (editDragging) onEditUp(); });
+window.addEventListener('touchend',  () => { if (editDragging) onEditUp(); });
+
+document.getElementById('editCancelBtn').addEventListener('click', exitEditView);
+document.getElementById('editSaveBtn').addEventListener('click', saveEditPosition);
+document.getElementById('themeBtn4').addEventListener('click', toggleTheme);
+
+/* ============ Init ============ */
+renderAxes();
+renderPaletteGrid();
+applyTheme();
+applyColorOverrides();
+applyScatterBtn();
+applyHidden();
+applyView();
+applyAnimationSeg();
+applySpeed();
+applyHover();
+applyColorInputs();
+setKnob();
+ensureStrategy();
+updateResults(false);
+</script>
+</body>
+</html>
